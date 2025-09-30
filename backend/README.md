@@ -53,6 +53,6 @@ Cada microservicio debe cumplir:
 
 ## Guías adicionales
 
-- **Eventos de integración**: están versionados (`.v1`, `.v2` …) y definidos en `Contracts` de cada MS.
+- **Eventos de integración**: están versionados (`.v1`, `.v2` …) y definidos en `Contracts` de Common.
 - **Idempotencia**: cada consumidor aplica patrón _Inbox_.
 - **Persistencia**: PostgreSQL por servicio.
