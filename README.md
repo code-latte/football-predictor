@@ -1,4 +1,5 @@
 # football-predictor
+
 Plataforma de predicciones de fútbol basada en microservicios, con aplicaciones móviles y web.  
 Este repositorio contiene **todo el ecosistema**:
 
@@ -49,7 +50,7 @@ Este repositorio contiene **todo el ecosistema**:
 
 ```bash
 # Arrancar infra base
-docker compose -f docker-compose.infra.yml up -d
+docker compose -f infra/docker-compose.yml up -d
 
 # Levantar todos los servicios
 docker compose up -d
