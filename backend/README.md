@@ -21,6 +21,7 @@ Cada microservicio debe cumplir:
   - **.NET 8**
   - **NUnit** para testing
   - **Serilog** para logging estructurado
+  - **FluentMigrator** para migraciones de base de datos
   - **Prometheus** para métricas (endpoint `/metrics`)
   - **Grafana** para visualización (config centralizada en `/docs/infra/`)
 
@@ -56,3 +57,4 @@ Cada microservicio debe cumplir:
 - **Eventos de integración**: están versionados (`.v1`, `.v2` …) y definidos en `Contracts` de Common.
 - **Idempotencia**: cada consumidor aplica patrón _Inbox_.
 - **Persistencia**: PostgreSQL por servicio.
+- **Migraciones de base de datos**: gestionadas con FluentMigrator. Ver guía en `docs/process/migrations.md`.
