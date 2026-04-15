@@ -1,21 +1,21 @@
 # FootballCatch.UserProfile
 
-Microservicio que gestiona el **perfil de usuario**: nickname, avatar, preferencias, privacidad.
+Microservice that manages the **user profile**: nickname, avatar, preferences, privacy.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `profile.updated.v1`
 
 
-## Eventos consumidos
+## Consumed events
 - `identity.user.registered.v1`
 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

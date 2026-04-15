@@ -1,24 +1,24 @@
 # FootballCatch.Predictions
 
-Microservicio que gestiona las **predicciones de los usuarios** por partido.
+Microservice that manages **user predictions** per match.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `prediction.submitted.v1`
 - `prediction.locked.v1`
 - `prediction.replaced.v1`
 
 
-## Eventos consumidos
+## Consumed events
 - `match.upserted.v1`
 - `match.kickoff.v1`
 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

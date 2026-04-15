@@ -1,25 +1,25 @@
 # FootballCatch.Fixtures
 
-Microservicio de **calendario y resultados**: ingesta de partidos desde proveedor externo.
+Microservice for the **match calendar and results**: ingests matches from an external provider.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `match.upserted.v1`
 - `match.kickoff.v1`
 - `match.scoreChanged.v1`
 - `match.finalized.v1`
 
 
-## Eventos consumidos
+## Consumed events
 - `competition.created.v1`
 - `team.upserted.v1`
 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

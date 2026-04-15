@@ -1,31 +1,31 @@
 # FootballCatch App
 
-Aplicación móvil en **React Native** (Expo).
+Mobile application in **React Native** (Expo).
 
 ---
 
-## Responsabilidades
+## Responsibilities
 
-- Envío y consulta de predicciones
-- Recepción de notificaciones push
-- Rankings y perfil de usuario en móvil
+- Submitting and querying predictions
+- Receiving push notifications
+- Rankings and user profile on mobile
 
 ---
 
-## Tecnologías
+## Technologies
 
 - React Native + Expo
 - TypeScript
-- Consume `@footballcatch/common` para lógica de dominio y acceso a APIs
+- Consumes `@footballcatch/common` for domain logic and API access
 
 ---
 
-## Estructura
+## Structure
 
 ```
 /src/
-  screens/    # Pantallas de la app
-  components/ # Componentes reutilizables
+  screens/    # App screens
+  components/ # Reusable components
   hooks/      # Custom hooks
 /tests/
 ```

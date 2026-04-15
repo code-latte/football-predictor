@@ -1,23 +1,23 @@
 # FootballCatch.Stats
 
-Microservicio de **estadísticas y rankings globales**.
+Microservice for **global statistics and rankings**.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `leaderboard.updated.v1`
 - `leaderboard.kpi.updated.v1`
 
 
-## Eventos consumidos
+## Consumed events
 - `scoring.userScoreUpdated.v1`
 - `league.tableUpdated.v1`
 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.
