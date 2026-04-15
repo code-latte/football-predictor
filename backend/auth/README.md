@@ -1,23 +1,23 @@
 # FootballCatch.Auth
 
-Microservicio responsable de la **autenticación y autorización** de usuarios (registro, login, JWT, refresh tokens).
+Microservice responsible for user **authentication and authorisation** (registration, login, JWT, refresh tokens).
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `identity.user.registered.v1`
 - `identity.user.disabled.v1`
 - `identity.deviceToken.added.v1`
 
 
-## Eventos consumidos
-- Ninguno
+## Consumed events
+- None
 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

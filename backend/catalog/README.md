@@ -1,23 +1,23 @@
 # FootballCatch.Catalog
 
-Microservicio de **catálogo de competiciones y equipos**.
+Microservice for the **competition and team catalogue**.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `competition.created.v1`
 - `competition.updated.v1`
 - `team.upserted.v1`
 
 
-## Eventos consumidos
-- Ninguno
+## Consumed events
+- None
 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

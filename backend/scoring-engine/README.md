@@ -1,15 +1,15 @@
 # FootballCatch.ScoringEngine
 
-Microservicio encargado del **cálculo de puntos** por predicción y totales de usuario.
+Microservice responsible for **point calculation** per prediction and user totals.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `scoring.userScoreUpdated.v1`
 - `scoring.matchScored.v1`
 
 
-## Eventos consumidos
+## Consumed events
 - `prediction.submitted.v1`
 - `match.scoreChanged.v1`
 - `match.finalized.v1`
@@ -17,8 +17,8 @@ Microservicio encargado del **cálculo de puntos** por predicción y totales de 
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

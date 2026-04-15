@@ -1,31 +1,31 @@
 # FootballCatch Web
 
-Aplicación **Next.js** para acceso web a la plataforma de predicciones.
+**Next.js** application for web access to the predictions platform.
 
 ---
 
-## Responsabilidades
+## Responsibilities
 
-- Visualización de predicciones, resultados y rankings
-- Perfil de usuario y ligas privadas
-- SSR/ISR para páginas públicas (SEO)
+- Viewing predictions, results, and rankings
+- User profile and private leagues
+- SSR/ISR for public pages (SEO)
 
 ---
 
-## Tecnologías
+## Technologies
 
 - Next.js 14+ (App Router)
 - TypeScript
-- Consume `@footballcatch/common` para lógica de dominio y acceso a APIs
+- Consumes `@footballcatch/common` for domain logic and API access
 
 ---
 
-## Estructura
+## Structure
 
 ```
 /src/
-  app/        # Rutas (App Router)
-  components/ # Componentes UI reutilizables
+  app/        # Routes (App Router)
+  components/ # Reusable UI components
   hooks/      # Custom hooks
 /tests/
 ```

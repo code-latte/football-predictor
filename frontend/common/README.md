@@ -1,53 +1,53 @@
 # @footballcatch/common
 
-Librería **npm compartida** para todas las aplicaciones frontend.  
-Implementa **clean architecture** (Domain → Application → Infrastructure) sin dependencias de framework.
+**Shared npm library** for all frontend applications.  
+Implements **clean architecture** (Domain → Application → Infrastructure) with no framework dependencies.
 
 ---
 
-## Qué contiene
+## What it contains
 
 ### 1. Domain
-- Entidades y value objects (ej. `Prediction`, `League`, `UserId`)
-- Interfaces de repositorios y servicios (ports)
-- Reglas de negocio puras, sin efectos secundarios
+- Entities and value objects (e.g. `Prediction`, `League`, `UserId`)
+- Repository and service interfaces (ports)
+- Pure business rules, no side effects
 
 ### 2. Application
-- Use cases (ej. `SubmitPredictionUseCase`, `GetLeaderboardUseCase`)
-- DTOs de entrada/salida
-- Orchestración entre domain y puertos de infraestructura
+- Use cases (e.g. `SubmitPredictionUseCase`, `GetLeaderboardUseCase`)
+- Input/output DTOs
+- Orchestration between domain and infrastructure ports
 
 ### 3. Infrastructure
-- Implementaciones concretas de los puertos: clientes HTTP hacia los microservicios REST
-- Adaptadores de almacenamiento local (AsyncStorage, SecureStore)
-- Solo se instancia en las apps, nunca en domain ni application
+- Concrete implementations of the ports: HTTP clients towards REST microservices
+- Local storage adapters (AsyncStorage, SecureStore)
+- Only instantiated in the apps, never in domain or application
 
 ---
 
-## Qué **NO** debe ir aquí
+## What should **NOT** go here
 
-❌ Componentes React o React Native  
-❌ Lógica de routing o navegación  
-❌ Estilos o temas visuales  
-❌ Variables de entorno específicas de una app  
+❌ React or React Native components  
+❌ Routing or navigation logic  
+❌ Visual styles or themes  
+❌ App-specific environment variables  
 
 ---
 
-## Organización
+## Organisation
 
 ```
 /frontend/common/
   src/
-    domain/          # Entidades, value objects, interfaces (ports)
-    application/     # Use cases y DTOs
-    infrastructure/  # Clientes HTTP, adaptadores de storage
-  package.json       # Publicado como @footballcatch/common
+    domain/          # Entities, value objects, interfaces (ports)
+    application/     # Use cases and DTOs
+    infrastructure/  # HTTP clients, storage adapters
+  package.json       # Published as @footballcatch/common
 ```
 
 ---
 
-## Dependencias
+## Dependencies
 
-- Consumido por `web`, `backoffice` y `app` vía npm workspace
-- Versionado con SemVer; cambios breaking = major bump
-- Sin dependencias de React, Next.js ni React Native en `domain` y `application`
+- Consumed by `web`, `backoffice`, and `app` via npm workspace
+- Versioned with SemVer; breaking changes = major bump
+- No React, Next.js, or React Native dependencies in `domain` and `application`

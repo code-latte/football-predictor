@@ -1,31 +1,31 @@
 # FootballCatch Backoffice
 
-Panel de administración en **Next.js** para gestión interna de la plataforma.
+**Next.js** administration panel for internal platform management.
 
 ---
 
-## Responsabilidades
+## Responsibilities
 
-- Gestión de competiciones y equipos
-- Configuración de reglas de puntuación
-- Moderación de usuarios y ligas
+- Competition and team management
+- Scoring rules configuration
+- User and league moderation
 
 ---
 
-## Tecnologías
+## Technologies
 
 - Next.js 14+ (App Router)
 - TypeScript
-- Consume `@footballcatch/common` para lógica de dominio y acceso a APIs
+- Consumes `@footballcatch/common` for domain logic and API access
 
 ---
 
-## Estructura
+## Structure
 
 ```
 /src/
-  app/        # Rutas (App Router)
-  components/ # Componentes UI reutilizables
+  app/        # Routes (App Router)
+  components/ # Reusable UI components
   hooks/      # Custom hooks
 /tests/
 ```

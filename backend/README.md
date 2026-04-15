@@ -1,58 +1,58 @@
-# Backend de FootballCatch
+# FootballCatch Backend
 
-Aquí viven los microservicios .NET que forman el backend del sistema.
+This is where the .NET microservices that make up the system backend live.
 
 ---
 
-## Convenciones de proyecto
+## Project conventions
 
-Cada microservicio debe cumplir:
+Each microservice must comply with:
 
-- **Estructura de carpetas**
+- **Folder structure**
 
   ```
-  /src/      # Código del microservicio
-  /tests/    # Tests unitarios e integración
-  *.sln      # Solution en la raíz del microservicio
+  /src/      # Microservice code
+  /tests/    # Unit and integration tests
+  *.sln      # Solution at the microservice root
   ```
 
-- **Tecnologías obligatorias**
+- **Required technologies**
 
   - **.NET 8**
-  - **NUnit** para testing
-  - **Serilog** para logging estructurado
-  - **Prometheus** para métricas (endpoint `/metrics`)
-  - **Grafana** para visualización (config centralizada en `/docs/infra/`)
+  - **NUnit** for testing
+  - **Serilog** for structured logging
+  - **Prometheus** for metrics (endpoint `/metrics`)
+  - **Grafana** for visualization (centralised config in `/docs/infra/`)
 
-- **Arquitectura**
+- **Architecture**
 
-  - Capas: Domain / Application / Infrastructure / API
-  - DDD + CQRS: entidades, value objects, agregados.
-  - Eventos de dominio → convertidos en eventos de integración para RabbitMQ.
+  - Layers: Domain / Application / Infrastructure / API
+  - DDD + CQRS: entities, value objects, aggregates.
+  - Domain events → converted into integration events for RabbitMQ.
 
 - **Tests**
-  - Unit tests (mínimo 70% coverage en dominio).
-  - Contract tests (para eventos de integración).
-  - Test de integración mínima con DB (NUnit + Testcontainers opcional).
+  - Unit tests (minimum 70% coverage on domain).
+  - Contract tests (for integration events).
+  - Minimal DB integration test (NUnit + Testcontainers optional).
 
 ---
 
-## Microservicios actuales
+## Current microservices
 
-- `auth` → Registro, login, auth (JWT).
-- `user-profile` → Nicknames, avatares.
-- `catalog` → Info de equipos, ligas, jugadores.
-- `fixtures` → Calendario y resultados de partidos.
-- `predictions` → Gestión de predicciones de usuarios.
-- `scoring-engine` → Cálculo de puntos y totales.
-- `leagues` → Ligas privadas y rankings.
-- `notifications` → Push y correos.
-- `stats` → Tablas globales y estadísticas.
+- `auth` → Registration, login, auth (JWT).
+- `user-profile` → Nicknames, avatars.
+- `catalog` → Team, league, and player information.
+- `fixtures` → Match calendar and results.
+- `predictions` → User prediction management.
+- `scoring-engine` → Point and total calculation.
+- `leagues` → Private leagues and rankings.
+- `notifications` → Push and email.
+- `stats` → Global tables and statistics.
 
 ---
 
-## Guías adicionales
+## Additional guides
 
-- **Eventos de integración**: están versionados (`.v1`, `.v2` …) y definidos en `Contracts` de Common.
-- **Idempotencia**: cada consumidor aplica patrón _Inbox_.
-- **Persistencia**: PostgreSQL por servicio.
+- **Integration events**: versioned (`.v1`, `.v2` …) and defined in Common's `Contracts`.
+- **Idempotency**: each consumer applies the _Inbox_ pattern.
+- **Persistence**: PostgreSQL per service.

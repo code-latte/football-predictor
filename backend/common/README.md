@@ -1,17 +1,17 @@
 # FootballCatch.Common
 
-Proyecto **común** para el backend.  
-Contiene definiciones **compartidas entre microservicios** que son **estables, atemporales y sin lógica de dominio** específica de un servicio.
+**Common** project for the backend.  
+Contains definitions **shared across microservices** that are **stable, timeless, and free from domain logic** specific to any service.
 
 ---
 
-## Qué contiene
+## What it contains
 
-### 1. **Eventos de integración (Contracts)**
-- Definiciones de eventos publicados/consumidos entre microservicios.
-- Versionados con sufijo (`.v1`, `.v2`, …) para compatibilidad.
-- Estructuras planas (DTOs) en C#.
-- Ejemplo:
+### 1. **Integration events (Contracts)**
+- Definitions of events published/consumed between microservices.
+- Versioned with suffix (`.v1`, `.v2`, …) for compatibility.
+- Flat structures (DTOs) in C#.
+- Example:
 
 ```csharp
 public sealed record LeagueCreatedV1(
@@ -28,12 +28,12 @@ public sealed record LeagueCreatedV1(
 
 ---
 
-### 2. **Infraestructura de mensajería**
-- **Dispatcher de eventos** (`IEventPublisher`, `IEventDispatcher`) → interfaz y base común.  
-- Implementaciones concretas (ej. RabbitMQ, MassTransit) se hacen en cada microservicio dentro de *Infrastructure*, **no aquí**.
-- Este proyecto solo define las **interfaces y contratos**.
+### 2. **Messaging infrastructure**
+- **Event dispatcher** (`IEventPublisher`, `IEventDispatcher`) → common interface and base.  
+- Concrete implementations (e.g. RabbitMQ, MassTransit) are done inside each microservice's *Infrastructure* layer, **not here**.
+- This project only defines the **interfaces and contracts**.
 
-Ejemplo:
+Example:
 
 ```csharp
 public interface IIntegrationEvent
@@ -51,11 +51,11 @@ public interface IEventPublisher
 
 ---
 
-### 3. **Tipos y enums comunes**
-- Tipos reutilizados entre MS (ej. `UserId`, `LeagueId` como Strongly Typed IDs).
-- Enumeraciones que no pertenecen a un dominio concreto pero sí se usan en varios (ej. `PrivacyLevel`, `MembershipRole`).
+### 3. **Common types and enums**
+- Types reused across services (e.g. `UserId`, `LeagueId` as Strongly Typed IDs).
+- Enumerations that don't belong to a specific domain but are used across several (e.g. `PrivacyLevel`, `MembershipRole`).
 
-Ejemplo:
+Example:
 
 ```csharp
 public readonly record struct UserId(Guid Value);
@@ -71,40 +71,40 @@ public enum MembershipRole
 
 ---
 
-### 4. **Utilidades cross-cutting**
-- **ValueObject base** (igualdad estructural).
-- **AggregateRoot base** (gestión de eventos de dominio).
+### 4. **Cross-cutting utilities**
+- **Base ValueObject** (structural equality).
+- **Base AggregateRoot** (domain event management).
 - **Result / Guard** helpers.
-- **IClock** para abstraer tiempo (facilitar testing).
+- **IClock** to abstract time (facilitate testing).
 
 ---
 
-## Qué **NO** debe ir aquí
+## What should **NOT** go here
 
-❌ Reglas de negocio de un microservicio.  
-❌ Repositorios concretos o EF DbContexts.  
-❌ Implementaciones de RabbitMQ, Postgres, Redis.  
-❌ Configuración de endpoints, Docker o infra específica.  
+❌ Business logic of a microservice.  
+❌ Concrete repositories or EF DbContexts.  
+❌ RabbitMQ, Postgres, Redis implementations.  
+❌ Endpoint configuration, Docker, or specific infrastructure.  
 
 ---
 
-## Organización del proyecto
+## Project organisation
 
 ```
 /backend/common/
-  Contracts/           # Eventos de integración (versionados)
-  Messaging/           # Interfaces de dispatcher y publisher
-  Types/               # ValueObjects, IDs, enums comunes
+  Contracts/           # Integration events (versioned)
+  Messaging/           # Dispatcher and publisher interfaces
+  Types/               # Common ValueObjects, IDs, enums
   BuildingBlocks/      # Result, Guard, Entity, AggregateRoot
 ```
 
 ---
 
-## Dependencias
+## Dependencies
 
-- `FootballCatch.Common` se referencia desde los microservicios que:
-  - Publican o consumen eventos.
-  - Necesitan tipos/IDs/enums comunes.
-- Se versiona con **SemVer**. Cambios breaking = major bump.
+- `FootballCatch.Common` is referenced from microservices that:
+  - Publish or consume events.
+  - Need common types/IDs/enums.
+- Versioned with **SemVer**. Breaking changes = major bump.
 
 ---

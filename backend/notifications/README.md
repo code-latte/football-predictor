@@ -1,14 +1,14 @@
 # FootballCatch.Notifications
 
-Microservicio encargado de enviar **notificaciones push y correos**.
+Microservice responsible for sending **push notifications and emails**.
 
 ---
 
-## Eventos emitidos
+## Emitted events
 - `notification.sent.v1`
 
 
-## Eventos consumidos
+## Consumed events
 - `match.kickoff.v1`
 - `prediction.locked.v1`
 - `scoring.userScoreUpdated.v1`
@@ -16,8 +16,8 @@ Microservicio encargado de enviar **notificaciones push y correos**.
 
 ---
 
-## Infraestructura
+## Infrastructure
 
-- Base de datos propia (PostgreSQL).
-- Endpoints REST expuestos según responsabilidades.
-- Endpoint `/metrics` para Prometheus.
+- Own database (PostgreSQL).
+- REST endpoints exposed according to responsibilities.
+- Endpoint `/metrics` for Prometheus.

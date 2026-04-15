@@ -1,36 +1,36 @@
-# Frontend de FootballCatch
+# FootballCatch Frontend
 
-Aquí viven las tres aplicaciones cliente y la librería compartida.
+This is where the three client applications and the shared library live.
 
 ---
 
-## Convenciones de proyecto
+## Project conventions
 
-Cada aplicación debe cumplir:
+Each application must comply with:
 
-- **Estructura de carpetas**
+- **Folder structure**
 
   ```
-  /src/      # Código de la aplicación
-  /tests/    # Tests unitarios y de integración
+  /src/      # Application code
+  /tests/    # Unit and integration tests
   package.json
   ```
 
-- **Tecnologías**
+- **Technologies**
 
-  - **web** y **backoffice**: Next.js 14+ (App Router)
+  - **web** and **backoffice**: Next.js 14+ (App Router)
   - **app**: React Native (Expo)
-  - **common**: TypeScript puro, sin dependencias de framework en domain y application
+  - **common**: Pure TypeScript, no framework dependencies in domain and application
 
-- **Testing**: Jest + React Testing Library; E2E con Playwright (web/backoffice) o Detox (app)
-- **Calidad**: ESLint + Prettier con reglas del proyecto
-- **Arquitectura**: Lógica de negocio y acceso a datos en `common`; las apps solo consumen los use cases expuestos
+- **Testing**: Jest + React Testing Library; E2E with Playwright (web/backoffice) or Detox (app)
+- **Quality**: ESLint + Prettier with project rules
+- **Architecture**: Business logic and data access in `common`; apps only consume exposed use cases
 
 ---
 
-## Aplicaciones
+## Applications
 
-- `web` → Next.js web app (predicciones, rankings, perfil)
-- `backoffice` → Next.js admin (competiciones, reglas, moderación)
-- `app` → React Native mobile (predicciones y notificaciones push)
-- `common` → Librería npm compartida (`@footballcatch/common`) con clean architecture
+- `web` → Next.js web app (predictions, rankings, profile)
+- `backoffice` → Next.js admin (competitions, rules, moderation)
+- `app` → React Native mobile (predictions and push notifications)
+- `common` → Shared npm library (`@footballcatch/common`) with clean architecture
