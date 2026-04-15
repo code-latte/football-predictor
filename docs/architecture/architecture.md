@@ -1,6 +1,6 @@
 # Architecture Overview
 
-FootballCatch is built with a **microservices architecture** on .NET 8.
+FootballCatch is built with a **microservices architecture** on .NET 10.
 
 ## System Context
 - **Users**: web, mobile app, and backoffice admins.  

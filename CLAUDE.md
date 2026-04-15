@@ -8,7 +8,7 @@ Read this file at the start of every session before doing any work. It is the au
 
 **Name:** FootballCatch  
 **What it is:** A football prediction platform built with microservices, a web app, a mobile app, and a backoffice.  
-**Stack:** .NET 8 backend, Next.js web + backoffice, React Native (Expo) mobile, PostgreSQL, RabbitMQ, Redis.  
+**Stack:** .NET 10 backend, Next.js web + backoffice, React Native (Expo) mobile, PostgreSQL, RabbitMQ, Redis.  
 **Deployment:** Ubuntu VPS, Docker Compose, GitHub Actions CI/CD.
 
 ---
@@ -16,7 +16,7 @@ Read this file at the start of every session before doing any work. It is the au
 ## 2. Repository Layout
 
 ```
-/backend/             # .NET 8 microservices (one folder per service)
+/backend/             # .NET 10 microservices (one folder per service)
   auth/
   catalog/
   common/             # Shared contracts, strongly-typed IDs, cross-cutting utilities

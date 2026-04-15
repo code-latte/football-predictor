@@ -18,7 +18,7 @@ Each microservice must comply with:
 
 - **Required technologies**
 
-  - **.NET 8**
+  - **.NET 10**
   - **NUnit** for testing
   - **Serilog** for structured logging
   - **Prometheus** for metrics (endpoint `/metrics`)

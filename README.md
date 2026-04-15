@@ -5,7 +5,7 @@ This repository contains **the entire ecosystem**:
 
 - **Backend**
 
-  - .NET 8 microservices with clean architecture (DDD + CQRS).
+  - .NET 10 microservices with clean architecture (DDD + CQRS).
   - RabbitMQ as the event bus.
   - PostgreSQL per microservice (one DB per bounded context).
   - Redis for caching and locks.
