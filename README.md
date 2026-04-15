@@ -11,27 +11,26 @@ Este repositorio contiene **todo el ecosistema**:
   - Redis para caché y locks.
   - Observabilidad con Prometheus, Grafana y logs estructurados con Serilog.
 
-- **Front-web**
+- **Frontend**
 
-  - Aplicación React para acceso web
-
-- **Front-app**
-
-  - Aplicación móvil en React Native
-
-- **Front-backoffice**
-  - Aplicación web en React para administración: gestión de competiciones, reglas, moderación.
+  - `frontend/web` → Next.js web app (SSR + ISR) para acceso web a predicciones y rankings.
+  - `frontend/app` → Aplicación móvil en React Native (Expo).
+  - `frontend/backoffice` → Next.js admin panel para gestión de competiciones, reglas y moderación.
+  - `frontend/common` → Librería compartida con clean architecture (domain + application + infrastructure), publicada como npm package.
 
 ---
 
 ## Estructura del repo
 
 ```
-/backend/                # Código de microservicios .NET
-/frontend-web/           # React web
-/frontend-app/           # React Native
-/frontend-backoffice/    # React admin
-/docs/                   # Documentación de arquitectura, ADRs, etc.
+/backend/           # Microservicios .NET
+/frontend/
+  web/              # Next.js web
+  app/              # React Native
+  backoffice/       # Next.js backoffice
+  common/           # npm package compartido
+/docs/              # Documentación de arquitectura, ADRs, etc.
+/infra/             # Docker, Postgres, RabbitMQ
 ```
 
 ---
