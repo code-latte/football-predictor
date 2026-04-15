@@ -9,7 +9,7 @@ Each microservice owns its PostgreSQL database. We need a consistent, version-co
 ## Decision
 We will use **FluentMigrator** because:
 - Code-first, strongly typed migrations in C# — no separate SQL files to manage.  
-- Fits naturally in .NET 8 / DI / hosted services.  
+- Fits naturally in .NET 10 / DI / hosted services.  
 - Built-in `Up`/`Down` support for rollbacks.  
 - Supports PostgreSQL out of the box.  
 - Migrations run automatically on startup — no external tooling required in CI/CD.
