@@ -1,0 +1,10 @@
+# CODEOWNERS
+#
+# Each line is a file pattern followed by one or more owners.
+# The last matching pattern takes the highest precedence.
+# Owners can be GitHub usernames (@user), org teams (@org/team),
+# or email addresses.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @vikator88 @Koruben @FerMoreno98 @Hawkysk8 @JordiCosta10 @SergioMorenoValiente
