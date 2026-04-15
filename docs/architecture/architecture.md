@@ -15,6 +15,12 @@ FootballCatch is built with a **microservices architecture** on .NET 8.
 - **Reverse Proxy**: Nginx as entry point.  
 - **Observability**: Prometheus metrics, Grafana dashboards, Serilog structured logging.
 
+## Frontend
+- **web**: Next.js app — server-side rendering, predictions UI, rankings.  
+- **backoffice**: Next.js admin panel — competition management, moderation.  
+- **app**: React Native (Expo) — mobile predictions and push notifications.  
+- **common**: Shared npm package (`@footballcatch/common`) implementing clean architecture (domain, application, infrastructure layers). Consumed by all three apps.
+
 ## Principles
 - DDD + CQRS.  
 - Event-driven integration.  
