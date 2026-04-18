@@ -1,42 +1,77 @@
 # Database Migrations
 
-All backend microservices use **FluentMigrator** to manage PostgreSQL schema migrations.  
-Migrations live inside each service under `src/Infrastructure/Migrations/` and run automatically on startup.
+All backend microservices use **EF Core Migrations** (Npgsql provider) to manage PostgreSQL schema changes.  
+Each service contains a dedicated `{Service}.Migrations` project that holds the `DbContext` and all generated migration classes. Migrations are applied automatically on startup.
+
+The decision to adopt EF Core Migrations and supersede FluentMigrator is recorded in `docs/adr/0005-use-efcore-migrations.md`.
 
 ---
 
-## Required packages
+## Project structure
 
-Add to each microservice's `.csproj`:
+Each microservice exposes a dedicated migrations project under `src/`:
+
+```
+src/
+  {Service}.Domain/
+  {Service}.Application/
+  {Service}.Infrastructure/
+  {Service}.Api/
+  {Service}.Migrations/        ← EF Core DbContext + all Migration classes
+```
+
+**`{Service}.Migrations` rules:**
+- Contains the EF Core `DbContext` configured for Npgsql and all generated `Migration` classes — nothing else.
+- Has no dependency on `{Service}.Domain` or `{Service}.Application`. Only EF Core and Npgsql packages.
+- Referenced by `{Service}.Infrastructure` (DI registration, startup execution) and by `{Service}.Tests.Infrastructure` (integration test database setup).
+
+---
+
+## Required NuGet packages
+
+Add to `{Service}.Migrations.csproj`:
 
 ```xml
-<PackageReference Include="FluentMigrator" Version="5.*" />
-<PackageReference Include="FluentMigrator.Runner" Version="5.*" />
-<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.*" />
+<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.*" />
+<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.*" />
+<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+```
+
+The `dotnet ef` CLI tool must also be available. Install it once per machine:
+
+```bash
+dotnet tool install --global dotnet-ef
 ```
 
 ---
 
-## Setup in Program.cs
+## Adding a migration
 
-```csharp
-// Register FluentMigrator
-builder.Services.AddFluentMigratorCore()
-    .ConfigureRunner(rb => rb
-        .AddPostgres()
-        .WithGlobalConnectionString(
-            builder.Configuration.GetConnectionString("Default"))
-        .ScanIn(typeof(Program).Assembly).For.Migrations())
-    .AddLogging(lb => lb.AddFluentMigratorConsole());
+Run from the repository root (or the service folder):
 
-var app = builder.Build();
-
-// Run pending migrations on startup
-using var scope = app.Services.CreateScope();
-scope.ServiceProvider
-    .GetRequiredService<IMigrationRunner>()
-    .MigrateUp();
+```bash
+dotnet ef migrations add {YYYYMMDDHHmm}_{PascalCaseDescription} \
+  --project src/{Service}.Migrations \
+  --startup-project src/{Service}.Api
 ```
+
+Example:
+
+```bash
+dotnet ef migrations add 202401150930_CreatePredictionsTable \
+  --project src/Predictions.Migrations \
+  --startup-project src/Predictions.Api
+```
+
+EF Core generates three files inside `{Service}.Migrations/Migrations/`:
+- `{timestamp}_{Description}.cs` — the `Up` and `Down` migration methods.
+- `{timestamp}_{Description}.Designer.cs` — snapshot metadata used by EF tooling.
+- `{ServiceName}DbContextModelSnapshot.cs` — the cumulative model snapshot (updated automatically).
+
+Always review the generated `.cs` file before committing to confirm it reflects the intended schema change.
 
 ---
 
@@ -44,112 +79,55 @@ scope.ServiceProvider
 
 | Part | Rule | Example |
 |---|---|---|
-| Version | Timestamp `YYYYMMDDHHmm` (12 digits) | `202401150930` |
-| Class | `M{version}_{PascalCaseDescription}` | `M202401150930_CreatePredictionsTable` |
-| File | Same as class name | `M202401150930_CreatePredictionsTable.cs` |
-| Folder | `src/Infrastructure/Migrations/` | — |
+| Timestamp | `YYYYMMDDHHmm` (12 digits) | `202401150930` |
+| Migration name argument | `{timestamp}_{PascalCaseDescription}` | `202401150930_CreatePredictionsTable` |
+| Generated class name | Same as the name argument | `202401150930_CreatePredictionsTable` |
+| Folder | `{Service}.Migrations/Migrations/` | — |
 
-Using a timestamp version guarantees global ordering without coordination across the team.
+Using a timestamp prefix guarantees global ordering without coordination across the team.
 
 ---
 
-## Examples
+## Applying migrations on startup
 
-### 1. Create a table (initial schema)
-
-```csharp
-[Migration(202401150930, "Create predictions table")]
-public class M202401150930_CreatePredictionsTable : Migration
-{
-    public override void Up()
-    {
-        Create.Table("predictions")
-            .WithColumn("id").AsGuid().PrimaryKey()
-            .WithColumn("user_id").AsGuid().NotNullable()
-            .WithColumn("match_id").AsGuid().NotNullable()
-            .WithColumn("predicted_home").AsInt32().NotNullable()
-            .WithColumn("predicted_away").AsInt32().NotNullable()
-            .WithColumn("submitted_at").AsDateTimeOffset().NotNullable();
-    }
-
-    public override void Down()
-    {
-        Delete.Table("predictions");
-    }
-}
-```
-
-### 2. Add a column
+In `{Service}.Api`, register and execute migrations via a hosted service or directly in `Program.cs`:
 
 ```csharp
-[Migration(202402010800, "Add locked_at column to predictions")]
-public class M202402010800_AddLockedAtToPredictions : Migration
-{
-    public override void Up()
-    {
-        Alter.Table("predictions")
-            .AddColumn("locked_at").AsDateTimeOffset().Nullable();
-    }
+// In Program.cs — register the DbContext from the Migrations project
+builder.Services.AddDbContext<PredictionsDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
-    public override void Down()
-    {
-        Delete.Column("locked_at").FromTable("predictions");
-    }
-}
+// Apply pending migrations on startup
+var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<PredictionsDbContext>();
+await dbContext.Database.MigrateAsync();
 ```
 
-### 3. Add an index
+`MigrateAsync()` is idempotent — it applies only migrations that have not yet been recorded in the `__EFMigrationsHistory` table.
 
-```csharp
-[Migration(202402150900, "Add index on predictions user_id")]
-public class M202402150900_AddIndexPredictionsUserId : Migration
-{
-    public override void Up()
-    {
-        Create.Index("ix_predictions_user_id")
-            .OnTable("predictions")
-            .OnColumn("user_id").Ascending();
-    }
+---
 
-    public override void Down()
-    {
-        Delete.Index("ix_predictions_user_id").OnTable("predictions");
-    }
-}
+## Generating a SQL script (for review or manual production apply)
+
+```bash
+dotnet ef migrations script \
+  --project src/{Service}.Migrations \
+  --startup-project src/{Service}.Api \
+  --output migrations.sql \
+  --idempotent
 ```
 
-### 4. Raw SQL (when the fluent API is insufficient)
-
-```csharp
-[Migration(202403010700, "Add check constraint on predicted scores")]
-public class M202403010700_AddScoreCheckConstraint : Migration
-{
-    public override void Up()
-    {
-        Execute.Sql(@"
-            ALTER TABLE predictions
-            ADD CONSTRAINT chk_scores_non_negative
-            CHECK (predicted_home >= 0 AND predicted_away >= 0);
-        ");
-    }
-
-    public override void Down()
-    {
-        Execute.Sql(@"
-            ALTER TABLE predictions
-            DROP CONSTRAINT chk_scores_non_negative;
-        ");
-    }
-}
-```
+The `--idempotent` flag wraps each statement in an existence check, making the script safe to run against databases at any migration level.
 
 ---
 
 ## Best practices
 
-- **Never modify** a migration that has been applied to any environment — add a new one instead.  
-- **Always implement `Down()`** — it enables rollback in production incidents.  
-- **One logical change per migration** — keep them small and focused.  
-- **Use `Execute.Sql()` only** when the fluent API cannot express the change.  
-- **Test migrations** in integration tests using Testcontainers (PostgreSQL container).  
-- **Do not put business logic** in migrations — schema changes only.
+- **Never delete or modify** a migration that has been applied to any environment — add a new migration instead.
+- **Review generated SQL** before committing. EF Core can generate unexpected statements for complex mappings (e.g. renamed columns, table splits).
+- **One logical change per migration** — keep them small and focused.
+- **Schema changes only** — no business logic, no seed data, no application-layer calls inside a migration.
+- **Test migrations in integration tests** — `{Service}.Tests.Infrastructure` references `{Service}.Migrations` and calls `MigrateAsync()` against a Testcontainers PostgreSQL container to verify the schema builds from scratch on every test run.
+- **Commit the model snapshot** — `{ServiceName}DbContextModelSnapshot.cs` must always be committed alongside its migration.

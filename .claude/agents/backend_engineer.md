@@ -20,17 +20,17 @@ Every task must start with this question: **which bounded context owns this beha
 
 The nine bounded contexts are:
 
-| Service | Root folder |
-|---|---|
-| Auth | `backend/auth/` |
-| User Profile | `backend/user-profile/` |
-| Catalog | `backend/catalog/` |
-| Fixtures | `backend/fixtures/` |
-| Predictions | `backend/predictions/` |
+| Service        | Root folder               |
+| -------------- | ------------------------- |
+| Auth           | `backend/auth/`           |
+| User Profile   | `backend/user-profile/`   |
+| Catalog        | `backend/catalog/`        |
+| Fixtures       | `backend/fixtures/`       |
+| Predictions    | `backend/predictions/`    |
 | Scoring Engine | `backend/scoring-engine/` |
-| Leagues | `backend/leagues/` |
-| Stats | `backend/stats/` |
-| Notifications | `backend/notifications/` |
+| Leagues        | `backend/leagues/`        |
+| Stats          | `backend/stats/`          |
+| Notifications  | `backend/notifications/`  |
 
 Shared contracts, base classes, interfaces, and strongly-typed IDs live in `backend/common/`. Add to Common only what is genuinely cross-service and stable.
 
@@ -48,6 +48,7 @@ API             ← REST controllers, request/response DTOs, middleware
 ```
 
 ### Domain Layer
+
 - Contains: Aggregates, Entities, Value Objects, Domain Events, Domain Exceptions, Repository interfaces, Service interfaces.
 - Zero dependencies on any framework, ORM, or infrastructure package.
 - Aggregates encapsulate their invariants. All state changes go through aggregate methods — never set properties from outside.
@@ -60,6 +61,7 @@ API             ← REST controllers, request/response DTOs, middleware
 - Domain exceptions are specific and descriptive: `PredictionWindowClosedException`, not `InvalidOperationException`.
 
 ### Application Layer
+
 - Contains: Commands, Queries, their Handlers, Application Services, DTOs, Validator logic, `IRepository` usage.
 - Implements CQRS: a handler either writes state (Command) or reads data (Query). Never both.
 - Command handlers: validate input → load aggregate → call domain method → persist → publish integration event.
@@ -69,13 +71,15 @@ API             ← REST controllers, request/response DTOs, middleware
 - Map domain events to integration events here (or in a dedicated `DomainEventHandler`), then publish via `IEventPublisher` from Common.
 
 ### Infrastructure Layer
-- Contains: EF Core `DbContext` (or Dapper), Repository implementations, RabbitMQ publisher/consumer implementations, FluentMigrator migrations, external HTTP clients, Redis cache adapters.
+
+- Contains: EF Core `DbContext`, Repository implementations, RabbitMQ publisher/consumer implementations, FluentMigrator migrations, external HTTP clients, Redis cache adapters.
 - Migrations live in `src/Infrastructure/Migrations/`. They run automatically on startup.
 - Repository implementations translate between domain aggregates and persistence models when necessary.
 - The RabbitMQ consumer for each event implements the **Inbox pattern** to guarantee idempotency (store `MessageId` before processing; skip if already seen).
 - External HTTP clients (e.g., football data API in the Updater) are wrapped in a typed client class and registered via `IHttpClientFactory`.
 
 ### API Layer
+
 - Contains: Controllers, Minimal API endpoints, Middleware (correlation ID, error handling, auth), request/response models.
 - Controllers are thin: validate the HTTP contract, map to a command/query, dispatch via MediatR (or equivalent), map result to HTTP response.
 - Never put business logic in controllers.
@@ -102,7 +106,7 @@ API             ← REST controllers, request/response DTOs, middleware
 ## DRY — Eliminate Duplication at the Right Level
 
 - Shared domain primitives (IDs, value objects, base classes) belong in `backend/common/` — not copy-pasted across services.
-- Duplication across services is sometimes *correct* — if two services need similar data shaped for their own context, that is intentional divergence, not a DRY violation. Only extract to Common when the concept is truly identical and stable across contexts.
+- Duplication across services is sometimes _correct_ — if two services need similar data shaped for their own context, that is intentional divergence, not a DRY violation. Only extract to Common when the concept is truly identical and stable across contexts.
 - Within a single service: extract shared logic to a domain service or a base class. Never copy business rules between handlers.
 
 ---
@@ -129,6 +133,7 @@ Events are the API between services. Treat them with the same care as a public R
 6. **Publishers use `IEventPublisher`** from Common. The RabbitMQ implementation is in each service's Infrastructure layer.
 
 Example contract:
+
 ```csharp
 // backend/common/Contracts/Predictions/PredictionSubmittedV1.cs
 public sealed record PredictionSubmittedV1(
@@ -198,13 +203,14 @@ public class M202406101400_CreatePredictionsTable : Migration
 
 Every piece of code delivered must include tests. No exceptions.
 
-| Type | Framework | Requirement |
-|---|---|---|
-| Unit | NUnit | ≥ 70% domain layer coverage. Test aggregates, value objects, domain services in isolation. Mock all I/O. |
-| Integration | NUnit + Testcontainers | At least one integration test per repository implementation and per migration. Real PostgreSQL container. |
-| Contract | NUnit + Common Contracts | Verify that events published match the agreed contract shape. Run in CI. |
+| Type        | Framework                | Requirement                                                                                               |
+| ----------- | ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Unit        | NUnit                    | ≥ 70% domain layer coverage. Test aggregates, value objects, domain services in isolation. Mock all I/O.  |
+| Integration | NUnit + Testcontainers   | At least one integration test per repository implementation and per migration. Real PostgreSQL container. |
+| Contract    | NUnit + Common Contracts | Verify that events published match the agreed contract shape. Run in CI.                                  |
 
 **Unit test structure (AAA):**
+
 ```csharp
 [Test]
 public void SubmitPrediction_WhenMatchHasNotKickedOff_ShouldRaisePredictionSubmittedEvent()
