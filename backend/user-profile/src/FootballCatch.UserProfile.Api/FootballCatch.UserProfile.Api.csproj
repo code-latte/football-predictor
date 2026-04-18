@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FootballCatch.UserProfile.Infrastructure\FootballCatch.UserProfile.Infrastructure.csproj" />
+    <ProjectReference Include="..\FootballCatch.UserProfile.Application\FootballCatch.UserProfile.Application.csproj" />
+  </ItemGroup>
+
+</Project>
