@@ -3,17 +3,19 @@
 We use a simplified **GitFlow branching model**.
 
 ## Branches
-- `main` → always production-ready. Tagged with semantic versioning.  
-- `develop` → integration branch for features.  
-- `feature/*` → new features, branched from `develop`.  
-- `release/*` → preparation for a release, bugfixes only.  
-- `hotfix/*` → critical fixes for production, branched from `main`.
+
+- `release` → always production-ready. Tagged with semantic versioning.
+- `main` → integration branch for features.
+- `feature/*` → new features, branched from `main`.
+- `hotfix/*` → critical fixes for production, branched from `release`.
 
 ## Merge Policy
-- Features → merged into `develop` via PR.  
-- Releases → merged into `main` and `develop`.  
-- Hotfixes → merged into `main` and cherry-picked into `develop`.  
+
+- Features → merged into `main` via PR.
+- Releases → merged into `release` from `main`.
+- Hotfixes → merged into `release` and cherry-picked into `main`.
 
 ## Versioning
-- Semantic Versioning (SemVer): MAJOR.MINOR.PATCH.  
-- Tags are created when merging to `main`.
+
+- Semantic Versioning (SemVer): MAJOR.MINOR.PATCH.
+- Tags are created when merging to `release`.
