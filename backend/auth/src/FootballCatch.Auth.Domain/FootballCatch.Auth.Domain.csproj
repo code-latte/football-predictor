@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+    <ItemGroup>
+    <Folder Include="users\Errors\" />
+    <Folder Include="users\Repository\" />
+    <Folder Include="users\Services\" />
+    <Folder Include="users\ValueObjects\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\common\FootballCatch.Common.csproj" />
+  </ItemGroup>
+
 </Project>
