@@ -1,7 +1,7 @@
 # ADR 0003: Use FluentMigrator for Database Migrations
 
 ## Status
-Superseded by ADR-0005
+Accepted — reaffirmed by ADR-0006
 
 ## Context
 Each microservice owns its PostgreSQL database. We need a consistent, version-controlled way to manage schema changes across all services. Options considered: EF Core Migrations, Flyway, DbUp, FluentMigrator.
