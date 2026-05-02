@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(dotnet new *)",
-      "Bash(dotnet *)"
+      "Bash(dotnet *)",
+      "Bash(Get-ChildItem *)",
+      "PowerShell(@\\(Get-ChildItem -Path \"D:\\\\github-personal\\\\football-predictor\\\\backend\\\\updater\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName | Sort-Object\\).Count)"
     ]
   }
 }
