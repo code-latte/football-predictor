@@ -1,11 +1,11 @@
 ﻿
-using FootballCatch.Auth.Domain.Exceptions;
-using FootballCatch.Auth.Domain.users.Aggregates;
-using FootballCatch.Auth.Domain.users.ValueObjects;
+using FootballCatch.Auth.Domain.Users.Aggregates;
+using FootballCatch.Auth.Domain.Users.ValueObjects;
 using FootballCatch.Common.BuildingBlocks;
+using FootballCatch.Common.Exceptions;
 
 
-namespace FootballCatch.Auth.Domain.users
+namespace FootballCatch.Auth.Domain.Users.Aggregates
 {
     public sealed class User : AggregateRoot<Guid>
     {
@@ -20,50 +20,87 @@ namespace FootballCatch.Auth.Domain.users
             Email = email;
             FullName = fullName;
         }
+        /// <summary>
+        /// Email from User
+        /// </summary>
         public string Email {get;private set;}
+        /// <summary>
+        /// Name and surnames from user
+        /// </summary>
         public string FullName {get;private set;}
         private List<DeviceToken> _deviceTokens = new();
+        /// <summary>
+        /// List of devices linked to a user
+        /// </summary>
         public IReadOnlyCollection<DeviceToken> DeviceTokens => _deviceTokens.AsReadOnly();
         private List<ExternalLogin> _externalLogins=new();
-
+        /// <summary>
+        /// List of providers linked to a user
+        /// </summary>
         public IReadOnlyCollection<ExternalLogin> ExternalLogins => _externalLogins.AsReadOnly();
-
+        /// <summary>
+        ///  Create a user with a external provider (Google, github...)
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="fullName"></param>
+        /// <param name="provider"></param>
+        /// <param name="providerUserId"></param>
+        /// <param name="now"></param>
+        /// <param name="providerEmail"></param>
+        /// <returns></returns>
+        /// <exception cref="DomainException"></exception>
         public static User CreateWithExternalProvider
         (
             string email,
             string fullName,
             string provider,
             string providerUserId,
+            DateTime now,
             string? providerEmail=null
         )
         {
+   
             User user=new User
             (
                 Guid.CreateVersion7(),
                 email,
                 fullName
             );
+            if (user.IsProviderAlreadyLinkedToUser(provider,providerUserId))
+            {
+                throw new DomainException($"Provider {provider} is already linked to an account");
+            }
             user._externalLogins.Add
             (
                 ExternalLogin.Create
                 (
                     provider,
                     providerUserId,
+                    now,
                     providerEmail
                 )
             );
             return user;
         }
-        public void JoinUserWithExternalProvider
+        /// <summary>
+        /// Link an existing user (registered by other method or linked to other provider) to an external provider
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="providerUserId"></param>
+        /// <param name="now"></param>
+        /// <param name="providerEmail"></param>
+        /// <exception cref="DomainException"></exception>
+        public void LinkUserWithExternalProvider
         (
             string provider,
             string providerUserId,
+            DateTime now,
             string? providerEmail=null
         )
         {
             if (IsProviderAlreadyLinkedToUser(provider,providerUserId))
             {
-                throw new DomainException($"Provider {provider} is already linked to this account");
+                throw new DomainException($"Provider {provider} is already linked to an account");
             }
 
             this._externalLogins.Add
@@ -72,11 +109,21 @@ namespace FootballCatch.Auth.Domain.users
                 (
                     provider,
                     providerUserId,
+                    now,
                     providerEmail
                 )
             );
 
         }
+        /// <summary>
+        /// Register a device and links it to a user
+        /// </summary>
+        /// <param name="deviceIdentifier"></param>
+        /// <param name="deviceName"></param>
+        /// <param name="platform"></param>
+        /// <param name="now"></param>
+        /// <param name="revokedAt"></param>
+        /// <returns></returns>
         public DeviceToken RegisterDevice
         (
             string deviceIdentifier,
@@ -109,6 +156,12 @@ namespace FootballCatch.Auth.Domain.users
             return device;
             }
         }
+        /// <summary>
+        /// determines if a user is linked to a provider
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="providerUserId"></param>
+        /// <returns></returns>
         public bool IsProviderAlreadyLinkedToUser(string provider, string providerUserId)
         {
             ExternalLogin? externallogin=_externalLogins.FirstOrDefault(p=>p.Provider==provider && p.ProviderUserId==providerUserId);

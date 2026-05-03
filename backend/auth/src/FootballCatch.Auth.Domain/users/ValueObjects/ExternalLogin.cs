@@ -2,7 +2,7 @@ using System;
 using FootballCatch.Common.BuildingBlocks;
 using FootballCatch.Common.Types;
 
-namespace FootballCatch.Auth.Domain.users.ValueObjects;
+namespace FootballCatch.Auth.Domain.Users.ValueObjects;
 
 public record ExternalLogin : ValueObject
 {
@@ -23,7 +23,9 @@ public record ExternalLogin : ValueObject
     (
         string provider,
         string providerUserId,
+        DateTime now,
         string? providerEmail=null
+        
     )
     {
         return new ExternalLogin
@@ -31,7 +33,7 @@ public record ExternalLogin : ValueObject
             provider,
             providerUserId,
             providerEmail,
-            new SystemClock().UtcNow
+            now
         );    
     }
 }
