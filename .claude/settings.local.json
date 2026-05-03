@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(dotnet new *)",
-      "Bash(dotnet *)"
+      "Bash(dotnet *)",
+      "Bash(Get-ChildItem -Path \"D:\\\\github-personal\\\\football-predictor\\\\backend\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   }
 }
