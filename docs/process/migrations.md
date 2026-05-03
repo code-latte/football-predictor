@@ -1,9 +1,8 @@
 # Database Migrations
 
-All backend microservices use **EF Core Migrations** (Npgsql provider) to manage PostgreSQL schema changes.  
-Each service contains a dedicated `{Service}.Migrations` project that holds the `DbContext` and all generated migration classes. Migrations are applied automatically on startup.
-
-The decision to adopt EF Core Migrations and supersede FluentMigrator is recorded in `docs/adr/0005-use-efcore-migrations.md`.
+All backend microservices use **FluentMigrator** to manage PostgreSQL schema changes.  
+EF Core (Npgsql provider) is the ORM for querying and persistence — it is **not** used for schema management.  
+The decision to reinstate FluentMigrator is recorded in `docs/adr/0006-reinstate-fluentmigrator.md`.
 
 ---
 
@@ -15,15 +14,16 @@ Each microservice exposes a dedicated migrations project under `src/`:
 src/
   {Service}.Domain/
   {Service}.Application/
-  {Service}.Infrastructure/
+  {Service}.Infrastructure/     ← DbContext lives here
   {Service}.Api/
-  {Service}.Migrations/        ← EF Core DbContext + all Migration classes
+  {Service}.Migrations/         ← FluentMigrator Migration classes only
 ```
 
 **`{Service}.Migrations` rules:**
-- Contains the EF Core `DbContext` configured for Npgsql and all generated `Migration` classes — nothing else.
-- Has no dependency on `{Service}.Domain` or `{Service}.Application`. Only EF Core and Npgsql packages.
-- Referenced by `{Service}.Infrastructure` (DI registration, startup execution) and by `{Service}.Tests.Infrastructure` (integration test database setup).
+- Contains only FluentMigrator `Migration` subclasses. No `DbContext`, no model snapshot, no Designer files.
+- Has **no** project reference to `{Service}.Domain`, `{Service}.Application`, or `{Service}.Infrastructure`.
+- Depends only on `FluentMigrator`, `FluentMigrator.Runner`, and `FluentMigrator.Runner.Postgres` NuGet packages.
+- Is referenced by `{Service}.Api` (to register the runner) and by `{Service}.Tests.Infrastructure` (to apply migrations in the Testcontainers integration test setup).
 
 ---
 
@@ -32,46 +32,51 @@ src/
 Add to `{Service}.Migrations.csproj`:
 
 ```xml
-<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.*" />
-<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.*" />
-<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*">
-  <PrivateAssets>all</PrivateAssets>
-  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-</PackageReference>
+<PackageReference Include="FluentMigrator" Version="6.*" />
+<PackageReference Include="FluentMigrator.Runner" Version="6.*" />
+<PackageReference Include="FluentMigrator.Runner.Postgres" Version="6.*" />
+<PackageReference Include="Npgsql" Version="9.*" />
 ```
 
-The `dotnet ef` CLI tool must also be available. Install it once per machine:
-
-```bash
-dotnet tool install --global dotnet-ef
-```
+No `dotnet ef` CLI tool is required — FluentMigrator migration classes are plain C# with no code-generation step.
 
 ---
 
-## Adding a migration
+## Migration class structure
 
-Run from the repository root (or the service folder):
+Each migration is a class that:
+- Is decorated with `[Migration(YYYYMMDDHHmm)]` — the timestamp is the version number.
+- Extends `FluentMigrator.Migration`.
+- Implements `Up()` (apply) and `Down()` (rollback) using the FluentMigrator fluent API.
 
-```bash
-dotnet ef migrations add {YYYYMMDDHHmm}_{PascalCaseDescription} \
-  --project src/{Service}.Migrations \
-  --startup-project src/{Service}.Api
+```csharp
+using FluentMigrator;
+
+namespace FootballCatch.Catalog.Migrations;
+
+[Migration(202401150930)]
+public sealed class CreateCompetitionsTable : Migration
+{
+    public override void Up()
+    {
+        Create.Table("competitions")
+            .WithColumn("id").AsGuid().PrimaryKey()
+            .WithColumn("name").AsString(200).NotNullable()
+            .WithColumn("country").AsString(100).NotNullable()
+            .WithColumn("season").AsString(20).NotNullable()
+            .WithColumn("logo_url").AsString(500).Nullable()
+            .WithColumn("external_id").AsString(100).Nullable().Unique()
+            .WithColumn("is_active").AsBoolean().NotNullable().WithDefaultValue(true)
+            .WithColumn("created_at_utc").AsDateTime().NotNullable()
+            .WithColumn("updated_at_utc").AsDateTime().NotNullable();
+    }
+
+    public override void Down()
+    {
+        Delete.Table("competitions");
+    }
+}
 ```
-
-Example:
-
-```bash
-dotnet ef migrations add 202401150930_CreatePredictionsTable \
-  --project src/Predictions.Migrations \
-  --startup-project src/Predictions.Api
-```
-
-EF Core generates three files inside `{Service}.Migrations/Migrations/`:
-- `{timestamp}_{Description}.cs` — the `Up` and `Down` migration methods.
-- `{timestamp}_{Description}.Designer.cs` — snapshot metadata used by EF tooling.
-- `{ServiceName}DbContextModelSnapshot.cs` — the cumulative model snapshot (updated automatically).
-
-Always review the generated `.cs` file before committing to confirm it reflects the intended schema change.
 
 ---
 
@@ -80,54 +85,92 @@ Always review the generated `.cs` file before committing to confirm it reflects 
 | Part | Rule | Example |
 |---|---|---|
 | Timestamp | `YYYYMMDDHHmm` (12 digits) | `202401150930` |
-| Migration name argument | `{timestamp}_{PascalCaseDescription}` | `202401150930_CreatePredictionsTable` |
-| Generated class name | Same as the name argument | `202401150930_CreatePredictionsTable` |
-| Folder | `{Service}.Migrations/Migrations/` | — |
+| `[Migration(...)]` attribute | Same timestamp as a `long` literal | `[Migration(202401150930)]` |
+| Class name | `{PascalCaseDescription}` | `CreateCompetitionsTable` |
+| File name | `{timestamp}_{PascalCaseDescription}.cs` | `202401150930_CreateCompetitionsTable.cs` |
+| Folder | `{Service}.Migrations/` (root of the project) | — |
+| Table names | PascalCase | `Competitions`, `Teams` |
+| Column names | PascalCase | `Id`, `Name`, `CountryIsoCode`, `CreatedAtUtc` |
+| Index names | `IX_{Table}_{Column(s)}` | `IX_Competitions_ExternalId` |
 
-Using a timestamp prefix guarantees global ordering without coordination across the team.
+PascalCase for table and column names matches C# property names directly. No column-name mapping is needed in FluentMigrator migration classes — the name in the migration is the name in the schema.
+
+Using a timestamp version guarantees global ordering without coordination across the team.
 
 ---
 
-## Applying migrations on startup
+## Database creation before migrations
 
-In `{Service}.Api`, register and execute migrations via a hosted service or directly in `Program.cs`:
+FluentMigrator operates only on tables and schema within an existing database — it does not create the PostgreSQL database itself. A `DatabaseInitializer` startup utility must run before the FluentMigrator runner to ensure the target database exists.
 
 ```csharp
-// In Program.cs — register the DbContext from the Migrations project
-builder.Services.AddDbContext<PredictionsDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+// {Service}.Api/DatabaseInitializer.cs
+using Npgsql;
 
-// Apply pending migrations on startup
-var app = builder.Build();
+internal static class DatabaseInitializer
+{
+    internal static async Task EnsureCreatedAsync(string connectionString)
+    {
+        var builder = new NpgsqlConnectionStringBuilder(connectionString);
+        var dbName = builder.Database!;
 
-using var scope = app.Services.CreateScope();
-var dbContext = scope.ServiceProvider.GetRequiredService<PredictionsDbContext>();
-await dbContext.Database.MigrateAsync();
+        // Connect to the maintenance database to issue CREATE DATABASE
+        builder.Database = "postgres";
+
+        await using var conn = new NpgsqlConnection(builder.ToString());
+        await conn.OpenAsync();
+
+        await using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"""
+            SELECT 1 FROM pg_database WHERE datname = '{dbName}'
+            """;
+
+        var exists = await cmd.ExecuteScalarAsync() is not null;
+        if (!exists)
+        {
+            cmd.CommandText = $"""CREATE DATABASE "{dbName}" """;
+            await cmd.ExecuteNonQueryAsync();
+        }
+    }
+}
 ```
 
-`MigrateAsync()` is idempotent — it applies only migrations that have not yet been recorded in the `__EFMigrationsHistory` table.
+Call `DatabaseInitializer.EnsureCreatedAsync` in `Program.cs` before wiring the FluentMigrator runner.
 
 ---
 
-## Generating a SQL script (for review or manual production apply)
+## Wiring the runner in DI
 
-```bash
-dotnet ef migrations script \
-  --project src/{Service}.Migrations \
-  --startup-project src/{Service}.Api \
-  --output migrations.sql \
-  --idempotent
+Register the FluentMigrator runner in `{Service}.Api/Program.cs` (or a shared Infrastructure extension method) and execute it at startup:
+
+```csharp
+// Register the runner
+builder.Services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+        .AddPostgres()
+        .WithGlobalConnectionString(connectionString)
+        .ScanIn(typeof(CreateCompetitionsTable).Assembly).For.Migrations())
+    .AddLogging(lb => lb.AddFluentMigratorConsole());
+
+var app = builder.Build();
+
+// Ensure database exists, then apply pending migrations
+await DatabaseInitializer.EnsureCreatedAsync(connectionString);
+
+using var scope = app.Services.CreateScope();
+var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+runner.MigrateUp();
 ```
 
-The `--idempotent` flag wraps each statement in an existence check, making the script safe to run against databases at any migration level.
+`MigrateUp()` is idempotent — it records applied versions in FluentMigrator's `VersionInfo` table and skips any already-applied migration.
 
 ---
 
 ## Best practices
 
 - **Never delete or modify** a migration that has been applied to any environment — add a new migration instead.
-- **Review generated SQL** before committing. EF Core can generate unexpected statements for complex mappings (e.g. renamed columns, table splits).
 - **One logical change per migration** — keep them small and focused.
 - **Schema changes only** — no business logic, no seed data, no application-layer calls inside a migration.
-- **Test migrations in integration tests** — `{Service}.Tests.Infrastructure` references `{Service}.Migrations` and calls `MigrateAsync()` against a Testcontainers PostgreSQL container to verify the schema builds from scratch on every test run.
-- **Commit the model snapshot** — `{ServiceName}DbContextModelSnapshot.cs` must always be committed alongside its migration.
+- **Keep EF configurations in sync** — the EF entity configurations in `{Service}.Infrastructure/Persistence/Configurations/` define the same schema as the FluentMigrator migrations. There is no automated check; review both when adding or altering a column.
+- **Test migrations in integration tests** — `{Service}.Tests.Infrastructure` references `{Service}.Migrations`, calls `DatabaseInitializer.EnsureCreatedAsync`, and then runs the FluentMigrator runner against a Testcontainers PostgreSQL container to verify the schema builds from scratch on every test run.
