@@ -10,7 +10,8 @@
 - **Scoring Engine** → calculates points and totals.  
 - **Leagues** → private and public leagues.  
 - **Stats** → leaderboards, KPIs, rankings.  
-- **Notifications** → push notifications and emails.
+- **Notifications** → push notifications and emails.  
+- **Updater** → background process; polls external football API and syncs data into Catalog and Fixtures via REST. Emits no events itself — Catalog and Fixtures emit events after persisting Updater-driven writes. See `backend/updater/README.md`.
 
 ## Communication
 - REST for synchronous APIs.  
