@@ -1,3 +1,5 @@
+using MediatR;
+
 namespace FootballCatch.Common.Mediator;
 
 /// <summary>
@@ -6,6 +8,6 @@ namespace FootballCatch.Common.Mediator;
 /// Query handlers read directly from projections or read models — never through aggregates.
 /// </summary>
 /// <typeparam name="TResult">The type of data returned by this query.</typeparam>
-public interface IQuery<TResult>
+public interface IQuery<TResult> : IRequest<TResult>
 {
 }

@@ -1,3 +1,5 @@
+using MediatR;
+
 namespace FootballCatch.Common.Mediator;
 
 /// <summary>
@@ -5,11 +7,9 @@ namespace FootballCatch.Common.Mediator;
 /// Implementations are registered with the DI container and resolved by <see cref="IMediator"/>.
 /// </summary>
 /// <typeparam name="TCommand">The command type this handler processes.</typeparam>
-public interface ICommandHandler<in TCommand>
+public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand>
     where TCommand : ICommand
 {
-    /// <summary>Handles the given command.</summary>
-    Task HandleAsync(TCommand command, CancellationToken ct = default);
 }
 
 /// <summary>
@@ -18,9 +18,8 @@ public interface ICommandHandler<in TCommand>
 /// </summary>
 /// <typeparam name="TCommand">The command type this handler processes.</typeparam>
 /// <typeparam name="TResult">The type of the value produced by this handler.</typeparam>
-public interface ICommandHandler<in TCommand, TResult>
+public interface ICommandHandler<in TCommand, TResult> : IRequestHandler<TCommand, TResult>
     where TCommand : ICommand<TResult>
 {
-    /// <summary>Handles the given command and returns a result.</summary>
-    Task<TResult> HandleAsync(TCommand command, CancellationToken ct = default);
+
 }

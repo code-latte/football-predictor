@@ -30,7 +30,7 @@ public sealed class Mediator : IMediator
         ICommandHandler<TCommand> handler = ResolveHandler<ICommandHandler<TCommand>>(
             typeof(ICommandHandler<TCommand>));
 
-        await handler.HandleAsync(command, ct);
+        await handler.Handle(command, ct);
     }
 
     /// <inheritdoc />
@@ -43,7 +43,7 @@ public sealed class Mediator : IMediator
             ResolveHandler<ICommandHandler<TCommand, TResult>>(
                 typeof(ICommandHandler<TCommand, TResult>));
 
-        return await handler.HandleAsync(command, ct);
+        return await handler.Handle(command, ct);
     }
 
     /// <inheritdoc />
@@ -56,7 +56,7 @@ public sealed class Mediator : IMediator
             ResolveHandler<IQueryHandler<TQuery, TResult>>(
                 typeof(IQueryHandler<TQuery, TResult>));
 
-        return await handler.HandleAsync(query, ct);
+        return await handler.Handle(query, ct);
     }
 
     private THandler ResolveHandler<THandler>(Type handlerType)
