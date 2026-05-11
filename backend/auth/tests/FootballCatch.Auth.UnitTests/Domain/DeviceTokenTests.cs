@@ -1,8 +1,8 @@
 
 
 using FluentAssertions;
-using FootballCatch.Auth.Domain.users;
-using FootballCatch.Auth.Domain.users.Aggregates;
+using FootballCatch.Auth.Domain.Users;
+using FootballCatch.Auth.Domain.Users.Aggregates;
 using NUnit.Framework;
 
 namespace FootballCatch.Auth.UnitTests.Domain;

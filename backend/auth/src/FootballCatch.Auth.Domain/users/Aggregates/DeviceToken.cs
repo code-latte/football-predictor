@@ -5,6 +5,8 @@ namespace FootballCatch.Auth.Domain.Users.Aggregates
 {
     public sealed class DeviceToken : Entity<Guid>
     {
+
+        
         internal DeviceToken
         (
             Guid id,

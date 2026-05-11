@@ -9,7 +9,6 @@ namespace FootballCatch.Auth.Domain.Users.Aggregates
 {
     public sealed class User : AggregateRoot<Guid>
     {
-
         private User
         (
             Guid id,
@@ -49,7 +48,7 @@ namespace FootballCatch.Auth.Domain.Users.Aggregates
         /// <param name="providerEmail"></param>
         /// <returns></returns>
         /// <exception cref="DomainException"></exception>
-        public static User CreateWithExternalProvider
+        public static User CreateUserAndLinkToExternalProvider
         (
             string email,
             string fullName,
@@ -66,10 +65,6 @@ namespace FootballCatch.Auth.Domain.Users.Aggregates
                 email,
                 fullName
             );
-            if (user.IsProviderAlreadyLinkedToUser(provider,providerUserId))
-            {
-                throw new DomainException($"Provider {provider} is already linked to an account");
-            }
             user._externalLogins.Add
             (
                 ExternalLogin.Create
@@ -162,7 +157,11 @@ namespace FootballCatch.Auth.Domain.Users.Aggregates
         /// <param name="provider"></param>
         /// <param name="providerUserId"></param>
         /// <returns></returns>
-        public bool IsProviderAlreadyLinkedToUser(string provider, string providerUserId)
+        public bool IsProviderAlreadyLinkedToUser
+        (
+            string provider, 
+            string providerUserId
+        )
         {
             ExternalLogin? externallogin=_externalLogins.FirstOrDefault(p=>p.Provider==provider && p.ProviderUserId==providerUserId);
             return externallogin is not null;

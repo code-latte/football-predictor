@@ -1,6 +1,7 @@
 using FluentAssertions;
-using FootballCatch.Auth.Domain.Exceptions;
-using FootballCatch.Auth.Domain.users;
+using FootballCatch.Auth.Domain.Users.Aggregates;
+using FootballCatch.Auth.Domain.Users;
+using FootballCatch.Common.Exceptions;
 
 namespace FootballCatch.Auth.UnitTests.Domain;
 
@@ -50,7 +51,7 @@ public sealed class UserTests
         var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "google-123",_now);
 
         // Act
-        user.JoinUserWithExternalProvider("GitHub", "github-456",_now);
+        user.LinkUserWithExternalProvider("GitHub", "github-456",_now);
 
         // Assert
         user.ExternalLogins.Should().HaveCount(2);
@@ -64,7 +65,7 @@ public sealed class UserTests
         var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "google-123",_now);
 
         // Act
-        var act = () => user.JoinUserWithExternalProvider("Google", "google-123",_now);
+        var act = () => user.LinkUserWithExternalProvider("Google", "google-123",_now);
 
         // Assert
         act.Should().Throw<DomainException>()
