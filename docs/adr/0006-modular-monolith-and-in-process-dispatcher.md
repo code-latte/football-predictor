@@ -28,7 +28,7 @@ The backend is delivered as a **modular monolith**.
 - The existing `IEventPublisher<T : IIntegrationEvent>` interface in `backend/common/Messaging` is repurposed as the in-process publisher contract. The interface shape is intentionally identical to the shape a real broker publisher would have: a typed publish method accepting an `IIntegrationEvent` instance. No new abstraction name is introduced.
 - `IEventDispatcher` continues to dispatch intra-aggregate domain events. Its role is unchanged.
 - All event contracts continue to live in `backend/common/Contracts` and continue to be versioned (`.v1`, `.v2`, …). Versioning discipline is preserved so that the door to reintroduce a real bus later is not closed.
-- The in-memory implementation of `IEventPublisher` is **deferred to a follow-up PR**. This ADR records the architectural direction; the implementation and any handler-registration mechanism land separately.
+- **Both `IEventPublisher` and `IEventDispatcher` have exactly one shared concrete implementation in `backend/common/Messaging` (`EventPublisher` and `EventDispatcher`).** Modules consume them via DI; modules never implement these two interfaces themselves. This mirrors the precedent already set by `backend/common/Mediator/Mediator.cs`. Modules contribute *handlers* — `IDomainEventHandler<T>` and `IIntegrationEventHandler<T>` implementations registered in DI — not dispatchers.
 
 The per-module `*.Api.csproj` host projects are retained for now. No composite host project is introduced in this change; the "modular monolith" framing is conceptual and structural for the moment.
 
@@ -38,7 +38,7 @@ The per-module `*.Api.csproj` host projects are retained for now. No composite h
 - Drastically lower operational complexity: one backend container, no broker to operate, no queue topology to maintain, no broker-side dead-letter handling.
 - Local development is simpler: starting the platform no longer requires booting RabbitMQ; integration tests no longer need a broker container.
 - Cross-module events keep their existing typed shape and versioning discipline — modules still communicate through declared events, not direct method calls.
-- The migration path back to a real bus (RabbitMQ or otherwise) remains clear: implement `IEventPublisher` against the broker, register the handler-side consumer, and swap the in-process implementation for the broker implementation. No event contract changes required.
+- The migration path back to a real bus (RabbitMQ or otherwise) remains clear and is even more localised under this design: only the single shared `EventPublisher` class in `backend/common/Messaging` needs to be replaced with a broker-backed implementation (or have its DI registration swapped). Module *handler* code (`IIntegrationEventHandler<T>` implementations) is unaffected, and no event contract changes are required.
 
 **Negative / obligations:**
 - Cross-process decoupling and independent deployability are lost. The whole backend is now built, tested, and deployed as one unit.

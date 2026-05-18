@@ -1,14 +1,14 @@
 # FootballCatch.Common
 
 **Common** project for the backend.  
-Contains definitions **shared across microservices** that are **stable, timeless, and free from domain logic** specific to any service.
+Contains definitions **shared across modules** that are **stable, timeless, and free from domain logic** specific to any module.
 
 ---
 
 ## What it contains
 
 ### 1. **Integration events (Contracts)**
-- Definitions of events published/consumed between microservices.
+- Definitions of events published/consumed between modules in-process via `IEventPublisher`.
 - Versioned with suffix (`.v1`, `.v2`, …) for compatibility.
 - Flat structures (DTOs) in C#.
 - Example:
@@ -29,9 +29,8 @@ public sealed record LeagueCreatedV1(
 ---
 
 ### 2. **Messaging infrastructure**
-- **Event dispatcher** (`IEventPublisher`, `IEventDispatcher`) → common interface and base.  
-- Concrete implementations (e.g. RabbitMQ, MassTransit) are done inside each microservice's *Infrastructure* layer, **not here**.
-- This project only defines the **interfaces and contracts**.
+- **Event dispatcher and publisher** (`IEventDispatcher`, `IEventPublisher`) → interfaces and their **single shared concrete implementations** in this project (`EventDispatcher`, `EventPublisher`). Follows the same pattern as `Mediator.cs`.
+- **Handler interfaces** (`IDomainEventHandler<T>`, `IIntegrationEventHandler<T>`) — modules implement these and register them in DI; modules never implement the dispatcher or publisher themselves.
 
 Example:
 
@@ -81,9 +80,9 @@ public enum MembershipRole
 
 ## What should **NOT** go here
 
-❌ Business logic of a microservice.  
+❌ Business logic of a module.  
 ❌ Concrete repositories or EF DbContexts.  
-❌ RabbitMQ, Postgres, Redis implementations.  
+❌ Infrastructure-specific *integrations* (e.g. a broker-backed `IEventPublisher`, an EF `DbContext`, a Redis client) — these belong in a module's *Infrastructure* layer, not here. The in-memory `EventDispatcher` and `EventPublisher` *do* belong here because they have no infrastructure dependency.  
 ❌ Endpoint configuration, Docker, or specific infrastructure.  
 
 ---
@@ -93,7 +92,7 @@ public enum MembershipRole
 ```
 /backend/common/
   Contracts/           # Integration events (versioned)
-  Messaging/           # Dispatcher and publisher interfaces
+  Messaging/           # Dispatcher and publisher interfaces, their single shared in-memory implementations, and handler interfaces (IDomainEventHandler<T>, IIntegrationEventHandler<T>)
   Types/               # Common ValueObjects, IDs, enums
   BuildingBlocks/      # Result, Guard, Entity, AggregateRoot
 ```
@@ -102,7 +101,7 @@ public enum MembershipRole
 
 ## Dependencies
 
-- `FootballCatch.Common` is referenced from microservices that:
+- `FootballCatch.Common` is referenced from modules that:
   - Publish or consume events.
   - Need common types/IDs/enums.
 - Versioned with **SemVer**. Breaking changes = major bump.

@@ -58,5 +58,5 @@ All modules are referenced from a single `FootballCatch.sln` at `backend/` root,
 
 ## Additional guides
 
-- **Application events**: versioned (`.v1`, `.v2`, …) and defined in Common's `Contracts`. Routed in-process by the dispatcher pattern.
+- **Application events**: versioned (`.v1`, `.v2`, …) and defined in Common's `Contracts`. Routed in-process by the dispatcher pattern. Both `IEventDispatcher` and `IEventPublisher` have a single shared concrete implementation in `backend/common/Messaging` (`EventDispatcher`, `EventPublisher`). Modules contribute handlers (`IDomainEventHandler<T>`, `IIntegrationEventHandler<T>`) only — they do not implement the dispatcher or publisher themselves.
 - **Persistence**: shared PostgreSQL database, table prefix per module to avoid collisions (see `docs/adr/0007-shared-database-shared-schema.md`).

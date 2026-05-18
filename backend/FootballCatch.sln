@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11222.15 d18.0
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "auth", "auth", "{183AEB3A-A086-1D8D-C95E-6378F77647C3}"
 EndProject
@@ -204,6 +204,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballCatch.UserProfile.Tests.Infrastructure", "user-profile\tests\FootballCatch.UserProfile.Tests.Infrastructure\FootballCatch.UserProfile.Tests.Infrastructure.csproj", "{2F1E5E23-7923-457C-B997-8EBC18614959}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballCatch.UserProfile.UnitTests", "user-profile\tests\FootballCatch.UserProfile.UnitTests\FootballCatch.UserProfile.UnitTests.csproj", "{DE7C7E1C-5109-4A5D-813C-87D041944B2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A776904-CCAD-B62B-88B6-A3966EFD12F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballCatch.Common.UnitTests", "common\tests\FootballCatch.Common.UnitTests\FootballCatch.Common.UnitTests.csproj", "{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1091,6 +1095,18 @@ Global
 		{DE7C7E1C-5109-4A5D-813C-87D041944B2A}.Release|x64.Build.0 = Release|Any CPU
 		{DE7C7E1C-5109-4A5D-813C-87D041944B2A}.Release|x86.ActiveCfg = Release|Any CPU
 		{DE7C7E1C-5109-4A5D-813C-87D041944B2A}.Release|x86.Build.0 = Release|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Debug|x64.Build.0 = Debug|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Debug|x86.Build.0 = Debug|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Release|x64.ActiveCfg = Release|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Release|x64.Build.0 = Release|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Release|x86.ActiveCfg = Release|Any CPU
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1187,5 +1203,7 @@ Global
 		{43CD4E58-EA2B-4CBD-9BBB-98058BD4727E} = {7F932D5E-134A-EB48-D8B1-EB6C7E0444A2}
 		{2F1E5E23-7923-457C-B997-8EBC18614959} = {7F932D5E-134A-EB48-D8B1-EB6C7E0444A2}
 		{DE7C7E1C-5109-4A5D-813C-87D041944B2A} = {7F932D5E-134A-EB48-D8B1-EB6C7E0444A2}
+		{6A776904-CCAD-B62B-88B6-A3966EFD12F4} = {881589EE-639B-0A35-DBCE-5D94E4FC90C0}
+		{EA6705E4-661B-47D0-BCB8-81A8BCF7BC6E} = {6A776904-CCAD-B62B-88B6-A3966EFD12F4}
 	EndGlobalSection
 EndGlobal

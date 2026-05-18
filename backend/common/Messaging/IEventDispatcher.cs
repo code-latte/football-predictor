@@ -9,8 +9,10 @@ namespace FootballCatch.Common.Messaging;
 /// change is durable.
 /// </summary>
 /// <remarks>
-/// Concrete implementations resolve <c>IDomainEventHandler&lt;T&gt;</c> registrations from the
-/// DI container and invoke them. One dispatcher implementation per module is sufficient.
+/// The shared concrete implementation is <c>FootballCatch.Common.Messaging.EventDispatcher</c>
+/// in this same project. Modules register it once in DI and register their own
+/// <c>IDomainEventHandler&lt;T&gt;</c> implementations alongside it; modules never implement
+/// <c>IEventDispatcher</c> themselves.
 /// </remarks>
 public interface IEventDispatcher
 {

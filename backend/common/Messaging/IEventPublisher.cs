@@ -4,8 +4,10 @@ namespace FootballCatch.Common.Messaging;
 
 /// <summary>
 /// Publishes integration events to in-process subscribers via the dispatcher pattern.
-/// The concrete in-memory implementation resolves handlers from the DI container and invokes
-/// them within the same process. The interface shape mirrors what a real out-of-process bus
+/// The shared concrete implementation is <c>FootballCatch.Common.Messaging.EventPublisher</c>
+/// in this same project. Modules register it once in DI and register their own
+/// <c>IIntegrationEventHandler&lt;T&gt;</c> implementations alongside it; modules never implement
+/// <c>IEventPublisher</c> themselves. The interface shape mirrors what a real out-of-process bus
 /// would expose so a real bus can be reintroduced later without changing call sites.
 /// </summary>
 public interface IEventPublisher
