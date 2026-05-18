@@ -7,7 +7,7 @@ public class CreateCompetitionsTable : Migration
 {
     public override void Up()
     {
-        Create.Table("Competitions")
+        Create.Table("catalog_competitions")
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
             .WithColumn("Name").AsString(200).NotNullable()
             .WithColumn("CountryIsoCode").AsFixedLengthString(2).NotNullable()
@@ -21,12 +21,12 @@ public class CreateCompetitionsTable : Migration
             .WithColumn("UpdatedAtUtc").AsCustom("timestamp with time zone").NotNullable();
 
         Execute.Sql(
-            "CREATE UNIQUE INDEX \"IX_Competitions_ExternalId\" " +
-            "ON \"Competitions\" (\"ExternalId\") WHERE \"ExternalId\" IS NOT NULL");
+            "CREATE UNIQUE INDEX \"ix_catalog_competitions_external_id\" " +
+            "ON \"catalog_competitions\" (\"ExternalId\") WHERE \"ExternalId\" IS NOT NULL");
     }
 
     public override void Down()
     {
-        Delete.Table("Competitions");
+        Delete.Table("catalog_competitions");
     }
 }
