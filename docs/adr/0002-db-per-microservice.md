@@ -1,7 +1,7 @@
 # ADR 0002: Database per Microservice
 
 ## Status
-Accepted
+Superseded by ADR-0007 (shared database, shared schema)
 
 ## Context
 We need to decide whether microservices share a single database or have independent databases.

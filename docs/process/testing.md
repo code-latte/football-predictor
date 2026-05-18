@@ -1,6 +1,6 @@
 # Testing Strategy
 
-All backend microservices follow a three-project test structure. Every test project lives under `tests/` at the service root.
+All backend modules follow a three-project test structure. Every test project lives under `tests/` at the module root.
 
 ---
 
@@ -8,23 +8,23 @@ All backend microservices follow a three-project test structure. Every test proj
 
 ```
 tests/
-  {Service}.UnitTests/              ← Pure domain and application logic, no I/O
-  {Service}.IntegrationTests/       ← Tests that hit a real PostgreSQL database
-  {Service}.Tests.Infrastructure/   ← Shared helpers: DB setup, fakes, builders
+  {Module}.UnitTests/              ← Pure domain and application logic, no I/O
+  {Module}.IntegrationTests/       ← Tests that hit a real PostgreSQL database
+  {Module}.Tests.Infrastructure/   ← Shared helpers: DB setup, fakes, builders
 ```
 
 ---
 
 ## Project purposes and dependencies
 
-### `{Service}.UnitTests`
+### `{Module}.UnitTests`
 
 Tests domain entities, value objects, domain services, and application use cases in isolation. No database, no network, no file system.
 
 **References:**
-- `{Service}.Domain`
-- `{Service}.Application`
-- `{Service}.Tests.Infrastructure` (optional — for shared object-mother / builder helpers)
+- `{Module}.Domain`
+- `{Module}.Application`
+- `{Module}.Tests.Infrastructure` (optional — for shared object-mother / builder helpers)
 
 **NuGet packages:**
 ```xml
@@ -42,14 +42,14 @@ Tests domain entities, value objects, domain services, and application use cases
 
 ---
 
-### `{Service}.IntegrationTests`
+### `{Module}.IntegrationTests`
 
-Tests that verify service behaviour against a real PostgreSQL database spun up by Testcontainers. These tests cover repository implementations, EF Core queries, and end-to-end command/query handlers that touch the database.
+Tests that verify module behaviour against a real PostgreSQL database spun up by Testcontainers. These tests cover repository implementations, EF Core queries, and end-to-end command/query handlers that touch the database.
 
 **References:**
-- `{Service}.Application`
-- `{Service}.Infrastructure`
-- `{Service}.Tests.Infrastructure`
+- `{Module}.Application`
+- `{Module}.Infrastructure`
+- `{Module}.Tests.Infrastructure`
 
 **NuGet packages:**
 ```xml
@@ -62,19 +62,21 @@ Tests that verify service behaviour against a real PostgreSQL database spun up b
 
 **Conventions:**
 - Never mock the database — use a real PostgreSQL container via Testcontainers.
-- Obtain the container connection string from `{Service}.Tests.Infrastructure.DatabaseFixture`.
+- Obtain the container connection string from `{Module}.Tests.Infrastructure.DatabaseFixture`.
 - Each test class that needs the database implements `IClassFixture<DatabaseFixture>` (or inherits a base class that does).
-- At least one integration test must exist per service.
+- At least one integration test must exist per module.
+
+> The move to a shared database (see `docs/adr/0007-shared-database-shared-schema.md`) is transparent to test setup. Each `DatabaseFixture` still spins up a fresh PostgreSQL container per fixture and calls `MigrateAsync()` on the module's `DbContext`.
 
 ---
 
-### `{Service}.Tests.Infrastructure`
+### `{Module}.Tests.Infrastructure`
 
-Shared test infrastructure consumed by both `{Service}.UnitTests` and `{Service}.IntegrationTests`. Contains no test classes — only infrastructure.
+Shared test infrastructure consumed by both `{Module}.UnitTests` and `{Module}.IntegrationTests`. Contains no test classes — only infrastructure.
 
 **References:**
-- `{Service}.Migrations` — to call `dbContext.Database.MigrateAsync()` against the containerised database.
-- `{Service}.Domain` (for builder / object-mother types).
+- `{Module}.Migrations` — to call `dbContext.Database.MigrateAsync()` against the containerised database.
+- `{Module}.Domain` (for builder / object-mother types).
 
 **NuGet packages:**
 ```xml
@@ -99,19 +101,19 @@ Shared test infrastructure consumed by both `{Service}.UnitTests` and `{Service}
 ## Dependency graph summary
 
 ```
-{Service}.UnitTests
-  → {Service}.Domain
-  → {Service}.Application
-  → {Service}.Tests.Infrastructure (optional)
+{Module}.UnitTests
+  → {Module}.Domain
+  → {Module}.Application
+  → {Module}.Tests.Infrastructure (optional)
 
-{Service}.IntegrationTests
-  → {Service}.Application
-  → {Service}.Infrastructure
-  → {Service}.Tests.Infrastructure
+{Module}.IntegrationTests
+  → {Module}.Application
+  → {Module}.Infrastructure
+  → {Module}.Tests.Infrastructure
 
-{Service}.Tests.Infrastructure
-  → {Service}.Migrations
-  → {Service}.Domain
+{Module}.Tests.Infrastructure
+  → {Module}.Migrations
+  → {Module}.Domain
 ```
 
 ---
@@ -127,7 +129,7 @@ Shared test infrastructure consumed by both `{Service}.UnitTests` and `{Service}
 
 ## Contract tests
 
-Integration events are validated against the contracts defined in `backend/common`. A CI check confirms that event shapes published and consumed by each service match the common contracts package. This check must pass before any PR is merged.
+Integration events are validated against the contracts defined in `backend/common`. A CI check confirms that event shapes published and consumed by each module match the common contracts package. This check must pass before any PR is merged.
 
 ---
 

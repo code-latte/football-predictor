@@ -42,7 +42,7 @@ frontend/common/
       use-cases/         # One class per use case (SubmitPredictionUseCase, JoinLeagueUseCase)
       dtos/              # Input and output shapes per use case
     infrastructure/
-      http/              # REST clients calling backend microservices (PredictionsHttpClient)
+      http/              # REST clients calling backend modules (PredictionsHttpClient)
       storage/           # Platform-agnostic storage port + implementations (ITokenStorage)
     index.ts             # Single barrel export — the only public API surface
   tests/
@@ -236,7 +236,7 @@ export interface SubmitPredictionOutput {
 
 Provides concrete implementations of domain ports. This is the only layer that touches external systems.
 
-**HTTP clients** — one client per backend microservice, implementing the corresponding domain port:
+**HTTP clients** — one client per backend module, implementing the corresponding domain port:
 ```typescript
 // src/infrastructure/http/PredictionsHttpClient.ts
 export class PredictionsHttpClient implements IPredictionPort {
@@ -294,7 +294,7 @@ export interface ITokenStorage {
 
 ## SOLID — Applied to TypeScript
 
-**Single Responsibility:** `SubmitPredictionUseCase` submits predictions. `GetLeaderboardUseCase` gets the leaderboard. `PredictionsHttpClient` talks to the Predictions microservice. No class does two things.
+**Single Responsibility:** `SubmitPredictionUseCase` submits predictions. `GetLeaderboardUseCase` gets the leaderboard. `PredictionsHttpClient` talks to the Predictions module. No class does two things.
 
 **Open/Closed:** Add new use cases by creating new classes, not by modifying existing ones. Add new HTTP clients by implementing the relevant port — existing use cases are unaffected. Use discriminated unions for extensible domain variants rather than patching switch statements.
 
@@ -578,11 +578,11 @@ describe('SubmitPredictionUseCase', () => {
 
 ---
 
-## Mapping to Backend Microservices
+## Mapping to Backend Modules
 
-Each HTTP client in `infrastructure/http/` corresponds to exactly one backend microservice. Use this mapping:
+Each HTTP client in `infrastructure/http/` corresponds to exactly one backend module. Use this mapping:
 
-| HTTP Client | Backend Microservice | Base path |
+| HTTP Client | Backend Module | Base path |
 |---|---|---|
 | `AuthHttpClient` | `backend/auth` | `/auth` |
 | `UserProfileHttpClient` | `backend/user-profile` | `/profile` |

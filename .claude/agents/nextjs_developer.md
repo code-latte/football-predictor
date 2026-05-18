@@ -21,7 +21,7 @@ Before writing anything, read `CLAUDE.md` at the repo root, then the README of t
 **Out of scope — never touch these:**
 - `frontend/common/` — owned by the `frontend-engineer` agent. If you need a new use case, entity, port, or HTTP client, raise the need rather than implementing it yourself in either app.
 - `frontend/app/` — the React Native Expo mobile app. Different runtime, different agent.
-- `backend/` — .NET microservices. Different agent entirely.
+- `backend/` — .NET modular monolith. Different agent entirely.
 
 ---
 

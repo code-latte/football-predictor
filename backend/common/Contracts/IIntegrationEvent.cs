@@ -1,7 +1,7 @@
 namespace FootballCatch.Common.Contracts;
 
 /// <summary>
-/// Marker interface for all integration events exchanged between microservices via RabbitMQ.
+/// Marker interface for all integration events exchanged between modules via the in-process event dispatcher.
 /// Concrete events are flat, immutable <c>sealed record</c> types that implement this interface.
 /// </summary>
 /// <remarks>

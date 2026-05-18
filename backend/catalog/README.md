@@ -1,6 +1,6 @@
 # FootballCatch.Catalog
 
-Microservice for the **competition and team catalogue**.
+Module for the **competition and team catalogue**. Cross-module communication is performed in-process via the dispatcher (see `backend/common/Messaging`).
 
 ---
 
@@ -18,6 +18,6 @@ Microservice for the **competition and team catalogue**.
 
 ## Infrastructure
 
-- Own database (PostgreSQL).
+- Shared PostgreSQL database; tables prefixed with `catalog_`.
 - REST endpoints exposed according to responsibilities.
 - Endpoint `/metrics` for Prometheus.

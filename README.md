@@ -1,13 +1,13 @@
 # football-predictor
 
-Microservices-based football prediction platform, with mobile and web applications.  
+Modular monolith football prediction platform, with mobile and web applications.  
 This repository contains **the entire ecosystem**:
 
 - **Backend**
 
-  - .NET 10 microservices with clean architecture (DDD + CQRS).
-  - RabbitMQ as the event bus.
-  - PostgreSQL per microservice (one DB per bounded context).
+  - .NET 10 modular monolith with clean architecture (DDD + CQRS).
+  - In-process event dispatcher for cross-module decoupling.
+  - Single PostgreSQL database with a shared schema; module boundaries enforced in code.
   - Redis for caching and locks.
   - Observability with Prometheus, Grafana, and structured logs with Serilog.
 
@@ -23,24 +23,25 @@ This repository contains **the entire ecosystem**:
 ## Repository structure
 
 ```
-/backend/           # .NET microservices
+/backend/           # .NET modular monolith (one folder per module)
 /frontend/
   web/              # Next.js web
   app/              # React Native
   backoffice/       # Next.js backoffice
   common/           # shared npm package
 /docs/              # Architecture documentation, ADRs, etc.
-/infra/             # Docker, Postgres, RabbitMQ
+/infra/             # Docker, Postgres
 ```
 
 ---
 
 ## Architecture overview
 
-- Each microservice is **autonomous**: it has its own logical repo inside `/backend/` with its own DB and event contracts.
+- Each module is a **bounded context** inside the monolith: it has its own folder under `/backend/`, its own domain model, and its own event contracts.
+- Module boundaries are enforced in code — modules do not directly query each other's tables. Tables are prefixed with the module short name to keep schemas collision-free.
 - Communication is:
   - **Synchronous** → REST calls to the BFF/Gateway.
-  - **Asynchronous** → events over RabbitMQ (fanout/topic).
+  - **Asynchronous / decoupled** → in-process events via the dispatcher pattern (see `backend/common/Messaging`).
 - CI/CD with **GitHub Actions**: build, test, and deploy to VPS with Docker Compose.
 
 ---
@@ -57,7 +58,6 @@ docker compose up -d
 
 Base infrastructure includes:
 
-- RabbitMQ
 - PostgreSQL
 - Redis
 - Prometheus + Grafana

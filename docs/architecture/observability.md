@@ -2,21 +2,21 @@
 
 ## Logging
 - **Serilog** structured logging.  
-- Correlation IDs for tracing across services.  
+- Correlation IDs for tracing across modules.  
 - Log levels: Info, Warning, Error.  
 
 ## Metrics
-- Each service exposes `/metrics` endpoint.  
-- Default metrics: HTTP requests, DB queries, RabbitMQ consumers.  
+- The backend exposes a `/metrics` endpoint.
+- Default metrics: HTTP requests, DB queries, in-process event handler invocations.
 - Custom metrics: domain-specific (predictions submitted, leagues created).  
 
 ## Tracing
-- Correlation IDs propagated through HTTP headers and RabbitMQ message properties.  
+- Correlation IDs propagated through HTTP headers and in-process event metadata.
 - Optional OpenTelemetry integration in the future.  
 
 ## Dashboards
 - Grafana dashboards for:  
-  - Service health.  
+  - Module health.  
   - Requests/sec.  
   - Event throughput.  
   - DB performance.  

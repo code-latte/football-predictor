@@ -7,7 +7,7 @@ public class CreateTeamsTable : Migration
 {
     public override void Up()
     {
-        Create.Table("Teams")
+        Create.Table("catalog_teams")
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
             .WithColumn("Name").AsString(200).NotNullable()
             .WithColumn("ShortCode").AsString(5).NotNullable()
@@ -19,12 +19,12 @@ public class CreateTeamsTable : Migration
             .WithColumn("UpdatedAtUtc").AsCustom("timestamp with time zone").NotNullable();
 
         Execute.Sql(
-            "CREATE UNIQUE INDEX \"IX_Teams_ExternalId\" " +
-            "ON \"Teams\" (\"ExternalId\") WHERE \"ExternalId\" IS NOT NULL");
+            "CREATE UNIQUE INDEX \"ix_catalog_teams_external_id\" " +
+            "ON \"catalog_teams\" (\"ExternalId\") WHERE \"ExternalId\" IS NOT NULL");
     }
 
     public override void Down()
     {
-        Delete.Table("Teams");
+        Delete.Table("catalog_teams");
     }
 }

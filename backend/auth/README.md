@@ -1,6 +1,6 @@
 # FootballCatch.Auth
 
-Microservice responsible for user **authentication and authorisation** (registration, login, JWT, refresh tokens).
+Module responsible for user **authentication and authorisation** (registration, login, JWT, refresh tokens). Cross-module communication is performed in-process via the dispatcher (see `backend/common/Messaging`).
 
 ---
 
@@ -18,6 +18,6 @@ Microservice responsible for user **authentication and authorisation** (registra
 
 ## Infrastructure
 
-- Own database (PostgreSQL).
+- Shared PostgreSQL database; tables prefixed with `auth_`.
 - REST endpoints exposed according to responsibilities.
 - Endpoint `/metrics` for Prometheus.
