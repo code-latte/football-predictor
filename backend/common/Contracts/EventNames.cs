@@ -1,12 +1,12 @@
 namespace FootballCatch.Common.Contracts;
 
 /// <summary>
-/// Strongly-typed registry of every RabbitMQ integration event name used across the FootballCatch platform.
+/// Strongly-typed registry of every cross-module application event name used across the FootballCatch platform.
 /// Use these constants instead of raw string literals when publishing or subscribing to events so that
 /// typos are caught at compile time and event names can be discovered via IDE tooling.
 /// </summary>
 /// <remarks>
-/// One nested static class per emitting service. Each constant holds the full, lowercase dot-separated
+/// One nested static class per emitting module. Each constant holds the full, lowercase dot-separated
 /// event name including its version suffix (e.g. <c>"prediction.submitted.v1"</c>).
 /// When a new event version is introduced, add a new constant — never change an existing one.
 /// </remarks>

@@ -1,19 +1,18 @@
 # FootballCatch Backend
 
-This is where the .NET microservices that make up the system backend live.
+This is where the .NET modular monolith that makes up the system backend lives.
 
 ---
 
 ## Project conventions
 
-Each microservice must comply with:
+Each module must comply with:
 
 - **Folder structure**
 
   ```
-  /src/      # Microservice code
+  /src/      # Module code (Domain / Application / Infrastructure / Api / Migrations)
   /tests/    # Unit and integration tests
-  *.sln      # Solution at the microservice root
   ```
 
 - **Required technologies**
@@ -28,7 +27,7 @@ Each microservice must comply with:
 
   - Layers: Domain / Application / Infrastructure / API
   - DDD + CQRS: entities, value objects, aggregates.
-  - Domain events → converted into integration events for RabbitMQ.
+  - Domain events handled by `IEventDispatcher`; cross-module integration events published in-process via `IEventPublisher` (see `backend/common/Messaging`).
 
 - **Tests**
   - Unit tests (minimum 70% coverage on domain).
@@ -37,7 +36,13 @@ Each microservice must comply with:
 
 ---
 
-## Current microservices
+## Solution layout
+
+All modules are referenced from a single `FootballCatch.sln` at `backend/` root, with solution folders mirroring the physical module folders. There is no per-module `.sln` file.
+
+---
+
+## Current modules
 
 - `auth` → Registration, login, auth (JWT).
 - `user-profile` → Nicknames, avatars.
@@ -53,6 +58,5 @@ Each microservice must comply with:
 
 ## Additional guides
 
-- **Integration events**: versioned (`.v1`, `.v2` …) and defined in Common's `Contracts`.
-- **Idempotency**: each consumer applies the _Inbox_ pattern.
-- **Persistence**: PostgreSQL per service.
+- **Application events**: versioned (`.v1`, `.v2`, …) and defined in Common's `Contracts`. Routed in-process by the dispatcher pattern.
+- **Persistence**: shared PostgreSQL database, table prefix per module to avoid collisions (see `docs/adr/0007-shared-database-shared-schema.md`).

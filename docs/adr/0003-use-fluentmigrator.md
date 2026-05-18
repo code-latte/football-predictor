@@ -4,7 +4,7 @@
 Accepted — reaffirmed by ADR-0006
 
 ## Context
-Each microservice owns its PostgreSQL database. We need a consistent, version-controlled way to manage schema changes across all services. Options considered: EF Core Migrations, Flyway, DbUp, FluentMigrator.
+Each module owns its PostgreSQL database. We need a consistent, version-controlled way to manage schema changes across all modules. Options considered: EF Core Migrations, Flyway, DbUp, FluentMigrator.
 
 ## Decision
 We will use **FluentMigrator** because:
@@ -15,7 +15,7 @@ We will use **FluentMigrator** because:
 - Migrations run automatically on startup — no external tooling required in CI/CD.
 
 ## Consequences
-- All microservices must include the FluentMigrator NuGet packages.  
+- All modules must include the FluentMigrator NuGet packages.  
 - Migrations are version-controlled alongside service code.  
 - Applied migrations must never be modified — only new migrations added.  
-- Each service maintains its own migration history via FluentMigrator's `VersionInfo` table.
+- Each module maintains its own migration history via FluentMigrator's `VersionInfo` table.

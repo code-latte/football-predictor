@@ -278,7 +278,7 @@
 **Trigger:** Admin opens the Grafana dashboard or checks the observability panel.
 
 **Flow:**
-1. Each microservice exposes `/metrics` collected by Prometheus.
+1. The backend exposes `/metrics` collected by Prometheus (per-module metrics included).
 2. Grafana displays dashboards for throughput, error rates, latency, and queue depth.
 3. Serilog structured logs are available with correlation IDs for cross-service tracing.
 4. Admin receives alerts when thresholds are breached.
@@ -400,7 +400,7 @@
 
 ## Event Summary
 
-The table below maps each use case to the integration events it produces or consumes across the microservices.
+The table below maps each use case to the integration events it produces or consumes across the modules.
 
 | Use Case | Events Emitted | Events Consumed |
 |---|---|---|

@@ -10,7 +10,7 @@ namespace FootballCatch.Common.Messaging;
 /// </summary>
 /// <remarks>
 /// Concrete implementations resolve <c>IDomainEventHandler&lt;T&gt;</c> registrations from the
-/// DI container and invoke them. One dispatcher implementation per service is sufficient.
+/// DI container and invoke them. One dispatcher implementation per module is sufficient.
 /// </remarks>
 public interface IEventDispatcher
 {

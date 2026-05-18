@@ -106,9 +106,9 @@ List both positive and negative consequences.
 
 ---
 
-### 2. Service README (Backend Microservice)
+### 2. Module README (Backend Module)
 
-**When to write/update:** When a new microservice is created, or when its responsibilities, events, or infrastructure change.
+**When to write/update:** When a new module is created, or when its responsibilities, events, or infrastructure change.
 
 **Location:** `backend/{service}/README.md`
 
@@ -228,7 +228,7 @@ Numbered list of things the system must do.
 ## Design
 
 ### Services Involved
-Which microservices are touched and what each one does.
+Which modules are touched and what each one does.
 
 ### Data Model Changes
 New tables, columns, or schema changes. Include migration class name.
@@ -389,9 +389,9 @@ Who to contact if this runbook does not resolve the issue.
 
 | Term | Meaning | Never use |
 |---|---|---|
-| microservice | One of the 9 backend services | service (ambiguous), module |
-| integration event | A message published to RabbitMQ | message (too vague), notification |
-| bounded context | The domain boundary of one microservice | domain (ambiguous) |
+| module | One of the 9 backend bounded contexts | service (ambiguous), microservice |
+| integration event | A cross-module event routed in-process by the dispatcher | message (too vague), notification |
+| bounded context | The domain boundary of one module | domain (ambiguous) |
 | prediction | A user's score guess for a match | tip, bet, pick |
 | match | A football game | game, fixture (in user-facing text) |
 | fixture | A scheduled or completed match (technical/backend term) | game |
@@ -450,7 +450,7 @@ Example format for event documentation:
 
 ### Review Triggers
 Documentation should be reviewed when:
-- A new microservice is added or removed.
+- A new module is added or removed.
 - A new ADR is accepted.
 - A feature changes an actor's capabilities (update `docs/use-cases.md`).
 - A new agent is defined (update the agents table in `CLAUDE.md` section 13).

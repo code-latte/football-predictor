@@ -1,7 +1,7 @@
 # ADR 0001: Use RabbitMQ as Event Bus
 
 ## Status
-Accepted
+Superseded by ADR-0006 (in-process dispatcher)
 
 ## Context
 We need asynchronous communication between microservices. Options considered: RabbitMQ, Kafka, Azure Service Bus.
