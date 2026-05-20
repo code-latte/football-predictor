@@ -12,8 +12,6 @@
 - **Grafana**: dashboards and visualization.  
 - **Serilog**: structured logging to console and files.
 
-> Note: the existing RabbitMQ container in `infra/docker-compose.yml` and `infra/rabbit-definitions.json` will be removed in a follow-up PR alongside the in-memory dispatcher implementation. It is no longer part of the target architecture.
-
 ## Deployment Workflow
 1. Build Docker images in GitHub Actions.  
 2. Push to Docker Hub.  
