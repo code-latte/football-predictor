@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="FluentAssertions" Version="8.9.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <PackageReference Include="NUnit" Version="4.5.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FootballCatch.Common.csproj" />
+
+    <ProjectReference Include="..\..\..\auth\src\FootballCatch.Auth.Application\FootballCatch.Auth.Application.csproj" />
+    <ProjectReference Include="..\..\..\auth\src\FootballCatch.Auth.Infrastructure\FootballCatch.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\auth\src\FootballCatch.Auth.Migrations\FootballCatch.Auth.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\catalog\src\FootballCatch.Catalog.Application\FootballCatch.Catalog.Application.csproj" />
+    <ProjectReference Include="..\..\..\catalog\src\FootballCatch.Catalog.Infrastructure\FootballCatch.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\catalog\src\FootballCatch.Catalog.Migrations\FootballCatch.Catalog.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\fixtures\src\FootballCatch.Fixtures.Application\FootballCatch.Fixtures.Application.csproj" />
+    <ProjectReference Include="..\..\..\fixtures\src\FootballCatch.Fixtures.Infrastructure\FootballCatch.Fixtures.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\fixtures\src\FootballCatch.Fixtures.Migrations\FootballCatch.Fixtures.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\leagues\src\FootballCatch.Leagues.Application\FootballCatch.Leagues.Application.csproj" />
+    <ProjectReference Include="..\..\..\leagues\src\FootballCatch.Leagues.Infrastructure\FootballCatch.Leagues.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\leagues\src\FootballCatch.Leagues.Migrations\FootballCatch.Leagues.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\notifications\src\FootballCatch.Notifications.Application\FootballCatch.Notifications.Application.csproj" />
+    <ProjectReference Include="..\..\..\notifications\src\FootballCatch.Notifications.Infrastructure\FootballCatch.Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\notifications\src\FootballCatch.Notifications.Migrations\FootballCatch.Notifications.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\predictions\src\FootballCatch.Predictions.Application\FootballCatch.Predictions.Application.csproj" />
+    <ProjectReference Include="..\..\..\predictions\src\FootballCatch.Predictions.Infrastructure\FootballCatch.Predictions.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\predictions\src\FootballCatch.Predictions.Migrations\FootballCatch.Predictions.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\scoring-engine\src\FootballCatch.ScoringEngine.Application\FootballCatch.ScoringEngine.Application.csproj" />
+    <ProjectReference Include="..\..\..\scoring-engine\src\FootballCatch.ScoringEngine.Infrastructure\FootballCatch.ScoringEngine.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\scoring-engine\src\FootballCatch.ScoringEngine.Migrations\FootballCatch.ScoringEngine.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\stats\src\FootballCatch.Stats.Application\FootballCatch.Stats.Application.csproj" />
+    <ProjectReference Include="..\..\..\stats\src\FootballCatch.Stats.Infrastructure\FootballCatch.Stats.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\stats\src\FootballCatch.Stats.Migrations\FootballCatch.Stats.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\updater\src\FootballCatch.Updater.Application\FootballCatch.Updater.Application.csproj" />
+    <ProjectReference Include="..\..\..\updater\src\FootballCatch.Updater.Infrastructure\FootballCatch.Updater.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\updater\src\FootballCatch.Updater.Migrations\FootballCatch.Updater.Migrations.csproj" />
+
+    <ProjectReference Include="..\..\..\user-profile\src\FootballCatch.UserProfile.Application\FootballCatch.UserProfile.Application.csproj" />
+    <ProjectReference Include="..\..\..\user-profile\src\FootballCatch.UserProfile.Infrastructure\FootballCatch.UserProfile.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\user-profile\src\FootballCatch.UserProfile.Migrations\FootballCatch.UserProfile.Migrations.csproj" />
+  </ItemGroup>
+
+</Project>

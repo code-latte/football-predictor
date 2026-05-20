@@ -52,9 +52,9 @@ Each backend module follows:
   {Module}.Migrations/      # EF Core DbContext + all Migration classes
 /tests/
   {Module}.UnitTests/             # Domain/application logic, no I/O
-  {Module}.IntegrationTests/      # Real PostgreSQL via Testcontainers
-  {Module}.Tests.Infrastructure/  # Shared DB setup, fakes, builders
 ```
+
+Backend integration tests are not per-module. They live in a single shared project at `backend/common/tests/FootballCatch.Common.IntegrationTests`, organised by cross-module scenario. See `docs/adr/0008-shared-integration-tests-project.md`.
 
 All modules are referenced from a single `FootballCatch.sln` at `backend/` root with solution folders mirroring the physical module folders. There is no per-module `.sln` file.
 
@@ -153,23 +153,24 @@ All three apps consume `@footballcatch/common`.
 
 ## 8. Testing Strategy
 
-Each backend module has three test projects under `tests/`:
+Backend tests live in two kinds of project:
 
-| Project                         | Purpose                                                                              | Key tools                              |
-| ------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
-| `{Module}.UnitTests`            | Domain and application logic, no I/O                                                 | NUnit, NSubstitute                     |
-| `{Module}.IntegrationTests`     | Real PostgreSQL via Testcontainers                                                   | NUnit, Testcontainers.PostgreSql       |
-| `{Module}.Tests.Infrastructure` | Shared DB setup (`DatabaseFixture`), fakes, object-mother builders — no test classes | Testcontainers.PostgreSql, NSubstitute |
+| Project                                  | Location                                          | Purpose                                                                                                | Key tools                        |
+| ---------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| `{Module}.UnitTests`                     | `backend/{module}/tests/`                         | Domain and application logic, no I/O                                                                   | NUnit, NSubstitute               |
+| `FootballCatch.Common.IntegrationTests`  | `backend/common/tests/`                           | Single shared project. Real PostgreSQL via Testcontainers. Organised by cross-module scenario folder.  | NUnit, Testcontainers.PostgreSql |
 
-`{Module}.Tests.Infrastructure` references `{Module}.Migrations` and calls `dbContext.Database.MigrateAsync()` to build the schema from scratch against the containerised database before integration tests run.
+The shared integration tests project references every module's `Application`, `Infrastructure`, and `Migrations` projects, plus `FootballCatch.Common`. A single `DatabaseFixture` starts one Testcontainers PostgreSQL per test run and applies every module's migrations against it before tests execute. Each module keeps its own `DbContext` and its own migrations history table (per ADR-0007). See ADR-0008 for the rationale and `docs/process/testing.md` for the full guide.
 
-| Level               | Tool                                      | Requirement                                                 |
-| ------------------- | ----------------------------------------- | ----------------------------------------------------------- |
-| Unit (C#)           | NUnit + NSubstitute                       | ≥ 70% domain layer coverage                                 |
-| Integration (C#)    | NUnit + Testcontainers (PostgreSQL)       | At least one integration test per module; never mock the DB |
-| Unit/Component (TS) | Jest + React Testing Library              | Component and hook logic                                    |
-| Contract            | CI check against Common Contracts package | Must pass before merge                                      |
-| E2E                 | Playwright/Cypress (web), Detox (mobile)  | Critical paths: submit prediction → scoring → leaderboard   |
+Guideline: tests that can be expressed with pure domain or application logic stay in `{Module}.UnitTests`. Only tests that need a real database, or that cross more than one module (typically via the in-process dispatcher), go in the shared integration project.
+
+| Level               | Tool                                      | Requirement                                                                  |
+| ------------------- | ----------------------------------------- | ---------------------------------------------------------------------------- |
+| Unit (C#)           | NUnit + NSubstitute                       | ≥ 70% domain layer coverage                                                  |
+| Integration (C#)    | NUnit + Testcontainers (PostgreSQL)       | Lives in the shared integration project; never mock the DB                   |
+| Unit/Component (TS) | Jest + React Testing Library              | Component and hook logic                                                     |
+| Contract            | CI check against Common Contracts package | Must pass before merge                                                       |
+| E2E                 | Playwright/Cypress (web), Detox (mobile)  | Critical paths: submit prediction → scoring → leaderboard                    |
 
 All tests run in GitHub Actions. **PRs cannot merge with failing tests.**
 
@@ -285,3 +286,4 @@ Specialised agent definitions live in `agents/`. Load the relevant agent when th
 | ADR: EF Core Migrations                         | `docs/adr/0005-use-efcore-migrations.md`                      |
 | ADR: Modular monolith and in-process dispatcher | `docs/adr/0006-modular-monolith-and-in-process-dispatcher.md` |
 | ADR: Shared database, shared schema             | `docs/adr/0007-shared-database-shared-schema.md`              |
+| ADR: Single shared integration tests project    | `docs/adr/0008-shared-integration-tests-project.md`           |

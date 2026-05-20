@@ -25,7 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\FootballCatch.Predictions.Domain\FootballCatch.Predictions.Domain.csproj" />
     <ProjectReference Include="..\..\src\FootballCatch.Predictions.Application\FootballCatch.Predictions.Application.csproj" />
-    <ProjectReference Include="..\FootballCatch.Predictions.Tests.Infrastructure\FootballCatch.Predictions.Tests.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
