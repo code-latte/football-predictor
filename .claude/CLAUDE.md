@@ -26,6 +26,7 @@ Read this file at the start of every session before doing any work. It is the au
   predictions/
   scoring-engine/
   stats/
+  updater/
   user-profile/
   FootballCatch.sln   # Single solution at backend/ root with solution folders per module
 /frontend/
@@ -92,6 +93,7 @@ All modules are referenced from a single `FootballCatch.sln` at `backend/` root 
 | **leagues**        | Private/public leagues, standings                       | `league.created.v1`, `league.joined.v1`, `league.left.v1`, `league.updated.v1`, `league.tableUpdated.v1` | `profile.updated.v1`, `scoring.userScoreUpdated.v1`, `identity.user.registered.v1` |
 | **stats**          | Global leaderboard, KPIs                                | `leaderboard.updated.v1`, `leaderboard.kpi.updated.v1`                                                   | `scoring.userScoreUpdated.v1`, `league.tableUpdated.v1`                            |
 | **notifications**  | Push + email                                            | `notification.sent.v1`                                                                                   | `match.kickoff.v1`, `prediction.locked.v1`, `scoring.userScoreUpdated.v1`          |
+| **updater**        | Polls external football data API and writes through Catalog/Fixtures to keep platform state in sync (background process — see `backend/updater/README.md`) | —                                                                                                        | —                                                                                  |
 
 Module contracts live in `backend/common` — kept versioned (`.v1`, `.v2`, …) for forward compatibility even though events are in-process. **Never change a published event's shape — add a new version.**
 
@@ -287,3 +289,5 @@ Specialised agent definitions live in `agents/`. Load the relevant agent when th
 | ADR: Modular monolith and in-process dispatcher | `docs/adr/0006-modular-monolith-and-in-process-dispatcher.md` |
 | ADR: Shared database, shared schema             | `docs/adr/0007-shared-database-shared-schema.md`              |
 | ADR: Single shared integration tests project    | `docs/adr/0008-shared-integration-tests-project.md`           |
+| ADR: api-sports.io as external football data provider (Proposed) | `docs/adr/0009-use-api-sports-as-external-football-data-provider.md` |
+| ADR: `Microsoft.Extensions.Http.Resilience` for HTTP retry (Proposed) | `docs/adr/0010-use-microsoft-extensions-http-resilience-for-http-retry.md` |

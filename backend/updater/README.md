@@ -46,11 +46,21 @@ Match window detection (when live polling is active) is driven by the presence o
 ## Infrastructure
 
 - Own PostgreSQL database — used to store the last-seen state of each external entity (external ID, last-modified hash, sync cursor) to enable idempotent delta syncing.
-- HTTP client to the external football data API (e.g., API-Football, football-data.org).
+- HTTP client to the external football data API (API-Football / api-sports.io — see ADR-0009).
 - HTTP clients to the Catalog service REST API and the Fixtures service REST API.
 - Hosted services (`.NET IHostedService` / `BackgroundService`) — one per scheduled job.
 - `/metrics` endpoint for Prometheus.
 - No RabbitMQ connection — the Updater neither publishes nor consumes events.
+
+### API Client (`IApiFootballClient`)
+
+- `IApiFootballClient` is defined in the **Application** layer (`FootballCatch.Updater.Application/ApiFootball/IApiFootballClient.cs`). Application code depends only on this port.
+- `ApiFootballClient` lives in **Infrastructure** as a **typed `HttpClient`** registered via `IHttpClientFactory`. It is the only place the external provider's wire details (base URL, auth header) are known.
+- The DI entrypoint is `AddUpdaterInfrastructure(IConfiguration)` in `FootballCatch.Updater.Infrastructure/DependencyInjection.cs`. It:
+  - Binds `ApiFootballOptions` from the `ApiFootball` configuration section with `ValidateDataAnnotations().ValidateOnStart()`, so misconfiguration fails the host at startup.
+  - Registers the typed client with `BaseAddress = options.BaseUrl` and the `x-apisports-key` header sourced from `options.ApiKey`.
+  - Attaches a resilience handler via `Microsoft.Extensions.Http.Resilience` (Polly v8 — see ADR-0010): retry strategy with `MaxRetryAttempts = options.RetryCount`, `Delay = TimeSpan.FromSeconds(options.BaseDelaySeconds)`, `DelayBackoffType.Exponential`, `UseJitter = true`. `ShouldHandle` covers `HttpRequestException`, HTTP status `>= 500`, and `408`.
+- `Task<ApiFootballCompetition?> GetCompetitionAsync(int id, CancellationToken)` is currently a stub (`NotImplementedException`). The real fetch + JSON-to-`ApiFootballCompetition` mapping is scheduled for a follow-up ticket.
 
 ---
 
@@ -91,10 +101,29 @@ Updater.sln
 
 ## Configuration
 
+The Updater binds settings from the standard .NET configuration pipeline. The `ApiFootball` section is the canonical source for the external API client.
+
+### `ApiFootball` section (`ApiFootballOptions`, `SectionName = "ApiFootball"`)
+
+Declared in `appsettings.json`; secrets supplied per-environment (see "Secrets" below).
+
+| Key | Default | Notes |
+|---|---|---|
+| `ApiFootball:BaseUrl` | `https://v3.football.api-sports.io/` | `[Required, Url]`. Base URL of the api-sports.io football API. |
+| `ApiFootball:ApiKey` | _(none)_ | `[Required]`. Sent on every request as the `x-apisports-key` header. See "Secrets". |
+| `ApiFootball:RetryCount` | `3` | Maximum retry attempts handled by the Polly v8 resilience pipeline. |
+| `ApiFootball:BaseDelaySeconds` | `1.0` | Base delay for the exponential backoff between retries. |
+| `ApiFootball:ActiveCompetitions` | `[]` | `int[]` of competition ids to sync. Filled manually for the environments we care about. |
+
+### Secrets
+
+- **Local dev:** `ApiKey` is provided via `dotnet user-secrets` against the `FootballCatch.Updater.Api` project (the csproj declares `<UserSecretsId>FootballCatch.Updater.Api</UserSecretsId>`). `appsettings.Development.json` only carries logging overrides.
+- **Other environments:** `ApiKey` is supplied via the `ApiFootball__ApiKey` environment variable. .NET configuration translates `__` to `:`, so `ApiFootball__ApiKey` and `ApiFootball:ApiKey` resolve to the same setting — pick whichever fits the host. The same `:` ↔ `__` rule applies to every other key in the section (e.g. `ApiFootball__RetryCount`).
+
+### Other environment variables (Updater-wide)
+
 | Environment variable | Description | Example |
 |---|---|---|
-| `FOOTBALL_API_BASE_URL` | Base URL of the external football data provider | `https://v3.football.api-sports.io` |
-| `FOOTBALL_API_KEY` | API key for the external provider | `abc123` |
 | `CATALOG_SERVICE_URL` | Base URL of the Catalog service REST API | `http://catalog-service:8080` |
 | `FIXTURES_SERVICE_URL` | Base URL of the Fixtures service REST API | `http://fixtures-service:8080` |
 | `SYNC_COMPETITIONS_CRON` | Cron expression for `SyncCompetitionsJob` | `0 3 * * *` (03:00 daily) |
@@ -112,3 +141,4 @@ Updater.sln
 - **Live polling activation.** The `LiveScorePollingJob` and `KickoffLockJob` should only run at elevated frequency when matches are actually in progress. Outside match windows they can run at a reduced cadence (or sleep entirely) to conserve API quota.
 - **Clock skew between external API and platform.** External API timestamps may lag by 1–2 minutes relative to actual kickoff. Apply a configurable tolerance window before treating a match as `In Progress`.
 - **No direct database access to Catalog or Fixtures.** The Updater must never read from or write to another service's database. All interactions go through REST APIs.
+- **Polly retry only covers transient HTTP failures.** The resilience pipeline retries on `HttpRequestException`, HTTP `>= 500`, and `408`. Business 4xx responses (e.g. `401` Unauthorized, `403` Forbidden, `404` Not Found, `429` rate-limited) are **not** retried by the default policy — they are surfaced to the caller, which must decide how to handle them. `429` in particular needs an explicit back-off strategy at the job level; do not rely on the HTTP resilience handler to absorb it.

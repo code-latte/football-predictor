@@ -11,7 +11,9 @@
       "PowerShell(Get-ChildItem -Path \"D:\\\\github-personal\\\\football-predictor\\\\backend\\\\common\\\\tests\" -Recurse | Where-Object { $_.Extension -in \".cs\", \".csproj\" } | Select-Object -ExpandProperty FullName)",
       "PowerShell(head *)",
       "Bash(Select-Object -ExpandProperty Name)",
-      "Bash(grep -E \"\\\\.cs$\")"
+      "Bash(grep -E \"\\\\.cs$\")",
+      "Bash(dir D:github-personalfootball-predictorbackendcommon *)",
+      "Bash(dir \"D:\\\\github-personal\\\\football-predictor\\\\backend\\\\catalog\\\\tests\\\\FootballCatch.Catalog.UnitTests\" -Recurse -Directory)"
     ]
   }
 }

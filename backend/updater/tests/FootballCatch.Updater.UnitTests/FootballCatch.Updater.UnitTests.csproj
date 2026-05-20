@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FootballCatch.Updater.Domain\FootballCatch.Updater.Domain.csproj" />
     <ProjectReference Include="..\..\src\FootballCatch.Updater.Application\FootballCatch.Updater.Application.csproj" />
+    <ProjectReference Include="..\..\src\FootballCatch.Updater.Infrastructure\FootballCatch.Updater.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

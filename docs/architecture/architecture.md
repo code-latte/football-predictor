@@ -8,7 +8,7 @@ FootballCatch is built as a **modular monolith** on .NET 10.
 - **Infrastructure**: PostgreSQL, Redis, Nginx, Prometheus, Grafana.
 
 ## Containers
-- **Backend deployable**: a single modular monolith composed of the following modules — Auth, User Profile, Catalog, Fixtures, Predictions, Scoring Engine, Leagues, Stats, Notifications.
+- **Backend deployable**: a single modular monolith composed of the following modules — Auth, User Profile, Catalog, Fixtures, Predictions, Scoring Engine, Leagues, Stats, Notifications, Updater.
 - **Database**: a single PostgreSQL database with a shared schema; tables are prefixed by module short name to keep boundaries collision-free.
 - **Cache**: Redis.  
 - **Reverse Proxy**: Nginx as entry point.  
