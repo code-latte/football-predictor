@@ -16,7 +16,7 @@ public sealed class DeviceTokenTests
     [SetUp]
     public void SetUp()
     {
-        _user = User.CreateWithExternalProvider
+        _user = User.CreateUserAndLinkToExternalProvider
         (
             "test@gmail.com",
             "Test", 

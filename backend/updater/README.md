@@ -1,6 +1,6 @@
 # FootballCatch.Updater
 
-Background microservice that fetches data from an external football data API and keeps the platform's competitions, teams, fixtures, live scores, and results in sync.
+Background module that fetches data from an external football data API and keeps the platform's competitions, teams, fixtures, live scores, and results in sync.
 
 ---
 
@@ -24,20 +24,20 @@ Integration events (`competition.created.v1`, `team.upserted.v1`, `match.upserte
 
 ## Events Consumed
 
-None. The Updater is not a RabbitMQ consumer.
+None. The Updater does not subscribe to in-process integration events.
 
 ---
 
 ## Scheduled Jobs
 
-| Job | Schedule | Use Case |
-|---|---|---|
-| `SyncCompetitionsJob` | Daily (configurable) | UC-UP01 — fetch and upsert active competitions |
-| `SyncTeamsJob` | Daily (configurable) | UC-UP02 — fetch and upsert teams per competition |
-| `SyncFixturesJob` | Daily, start of each matchday | UC-UP03 — fetch and upsert upcoming fixtures |
-| `LiveScorePollingJob` | Every 60 s during match windows | UC-UP04 — poll current scores for in-progress matches |
-| `FinalizeResultsJob` | Every 60 s during match windows | UC-UP05 — detect finished matches and finalize results |
-| `KickoffLockJob` | Every 60 s | UC-UP06 — detect kickoff and trigger prediction lock |
+| Job                   | Schedule                        | Use Case                                               |
+| --------------------- | ------------------------------- | ------------------------------------------------------ |
+| `SyncCompetitionsJob` | Daily (configurable)            | UC-UP01 — fetch and upsert active competitions         |
+| `SyncTeamsJob`        | Daily (configurable)            | UC-UP02 — fetch and upsert teams per competition       |
+| `SyncFixturesJob`     | Daily, start of each matchday   | UC-UP03 — fetch and upsert upcoming fixtures           |
+| `LiveScorePollingJob` | Every 60 s during match windows | UC-UP04 — poll current scores for in-progress matches  |
+| `FinalizeResultsJob`  | Every 60 s during match windows | UC-UP05 — detect finished matches and finalize results |
+| `KickoffLockJob`      | Every 60 s                      | UC-UP06 — detect kickoff and trigger prediction lock   |
 
 Match window detection (when live polling is active) is driven by the presence of matches in status `Scheduled` that are within the configured pre-kickoff buffer, or matches already in status `In Progress`.
 
@@ -45,7 +45,7 @@ Match window detection (when live polling is active) is driven by the presence o
 
 ## Infrastructure
 
-- Own PostgreSQL database — used to store the last-seen state of each external entity (external ID, last-modified hash, sync cursor) to enable idempotent delta syncing.
+- Persistence in the shared PostgreSQL database; the Updater owns tables prefixed with `updater_` to store the last-seen state of each external entity (external ID, last-modified hash, sync cursor) and enable idempotent delta syncing.
 - HTTP client to the external football data API (API-Football / api-sports.io — see ADR-0009).
 - HTTP clients to the Catalog service REST API and the Fixtures service REST API.
 - Hosted services (`.NET IHostedService` / `BackgroundService`) — one per scheduled job.
@@ -61,23 +61,24 @@ Match window detection (when live polling is active) is driven by the presence o
   - Registers the typed client with `BaseAddress = options.BaseUrl` and the `x-apisports-key` header sourced from `options.ApiKey`.
   - Attaches a resilience handler via `Microsoft.Extensions.Http.Resilience` (Polly v8 — see ADR-0010): retry strategy with `MaxRetryAttempts = options.RetryCount`, `Delay = TimeSpan.FromSeconds(options.BaseDelaySeconds)`, `DelayBackoffType.Exponential`, `UseJitter = true`. `ShouldHandle` covers `HttpRequestException`, HTTP status `>= 500`, and `408`.
 - `Task<ApiFootballCompetition?> GetCompetitionAsync(int id, CancellationToken)` is currently a stub (`NotImplementedException`). The real fetch + JSON-to-`ApiFootballCompetition` mapping is scheduled for a follow-up ticket.
+- No event publishing or consumption — the Updater neither publishes nor consumes in-process integration events.
 
 ---
 
 ## Communication with Other Services
 
-The Updater calls the **REST APIs** of the Catalog and Fixtures services. It does not publish to RabbitMQ.
+The Updater calls the **REST APIs** of the Catalog and Fixtures modules. It does not publish integration events.
 
-**Rationale:** The Catalog and Fixtures services own the bounded contexts for competitions/teams and matches respectively. Those services validate invariants, persist the data, and emit the authoritative integration events. If the Updater published events directly, it would bypass the owning service's business rules and produce events without the internal state being persisted — violating the "emitter owns the data" principle. Calling the services' REST APIs preserves bounded context ownership and keeps event responsibility unambiguous.
+**Rationale:** The Catalog and Fixtures modules own the bounded contexts for competitions/teams and matches respectively. Those modules validate invariants, persist the data, and emit the authoritative integration events. If the Updater published events directly, it would bypass the owning module's business rules and produce events without the internal state being persisted — violating the "emitter owns the data" principle. Calling the modules' REST APIs preserves bounded context ownership and keeps event responsibility unambiguous.
 
-| Target | Operation | Trigger |
-|---|---|---|
-| Catalog REST API | `PUT /competitions/{externalId}` | `SyncCompetitionsJob` |
-| Catalog REST API | `PUT /teams/{externalId}` | `SyncTeamsJob` |
-| Fixtures REST API | `PUT /matches/{externalId}` | `SyncFixturesJob` |
-| Fixtures REST API | `PUT /matches/{externalId}/score` | `LiveScorePollingJob` |
-| Fixtures REST API | `POST /matches/{externalId}/finalize` | `FinalizeResultsJob` |
-| Fixtures REST API | `POST /matches/{externalId}/kickoff` | `KickoffLockJob` |
+| Target            | Operation                             | Trigger               |
+| ----------------- | ------------------------------------- | --------------------- |
+| Catalog REST API  | `PUT /competitions/{externalId}`      | `SyncCompetitionsJob` |
+| Catalog REST API  | `PUT /teams/{externalId}`             | `SyncTeamsJob`        |
+| Fixtures REST API | `PUT /matches/{externalId}`           | `SyncFixturesJob`     |
+| Fixtures REST API | `PUT /matches/{externalId}/score`     | `LiveScorePollingJob` |
+| Fixtures REST API | `POST /matches/{externalId}/finalize` | `FinalizeResultsJob`  |
+| Fixtures REST API | `POST /matches/{externalId}/kickoff`  | `KickoffLockJob`      |
 
 ---
 
@@ -92,10 +93,10 @@ The Updater calls the **REST APIs** of the Catalog and Fixtures services. It doe
   Updater.Migrations/         # EF Core DbContext + migration classes for sync-state tables
 /tests/
   Updater.UnitTests/
-  Updater.IntegrationTests/
-  Updater.Tests.Infrastructure/
 Updater.sln
 ```
+
+Integration tests for the Updater live in the shared platform project at `backend/common/tests/FootballCatch.Common.IntegrationTests` — see ADR-0008.
 
 ---
 
@@ -107,13 +108,13 @@ The Updater binds settings from the standard .NET configuration pipeline. The `A
 
 Declared in `appsettings.json`; secrets supplied per-environment (see "Secrets" below).
 
-| Key | Default | Notes |
-|---|---|---|
-| `ApiFootball:BaseUrl` | `https://v3.football.api-sports.io/` | `[Required, Url]`. Base URL of the api-sports.io football API. |
-| `ApiFootball:ApiKey` | _(none)_ | `[Required]`. Sent on every request as the `x-apisports-key` header. See "Secrets". |
-| `ApiFootball:RetryCount` | `3` | Maximum retry attempts handled by the Polly v8 resilience pipeline. |
-| `ApiFootball:BaseDelaySeconds` | `1.0` | Base delay for the exponential backoff between retries. |
-| `ApiFootball:ActiveCompetitions` | `[]` | `int[]` of competition ids to sync. Filled manually for the environments we care about. |
+| Key                              | Default                              | Notes                                                                                   |
+| -------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
+| `ApiFootball:BaseUrl`            | `https://v3.football.api-sports.io/` | `[Required, Url]`. Base URL of the api-sports.io football API.                          |
+| `ApiFootball:ApiKey`             | _(none)_                             | `[Required]`. Sent on every request as the `x-apisports-key` header. See "Secrets".     |
+| `ApiFootball:RetryCount`         | `3`                                  | Maximum retry attempts handled by the Polly v8 resilience pipeline.                     |
+| `ApiFootball:BaseDelaySeconds`   | `1.0`                                | Base delay for the exponential backoff between retries.                                 |
+| `ApiFootball:ActiveCompetitions` | `[]`                                 | `int[]` of competition ids to sync. Filled manually for the environments we care about. |
 
 ### Secrets
 
@@ -122,15 +123,15 @@ Declared in `appsettings.json`; secrets supplied per-environment (see "Secrets" 
 
 ### Other environment variables (Updater-wide)
 
-| Environment variable | Description | Example |
-|---|---|---|
-| `CATALOG_SERVICE_URL` | Base URL of the Catalog service REST API | `http://catalog-service:8080` |
-| `FIXTURES_SERVICE_URL` | Base URL of the Fixtures service REST API | `http://fixtures-service:8080` |
-| `SYNC_COMPETITIONS_CRON` | Cron expression for `SyncCompetitionsJob` | `0 3 * * *` (03:00 daily) |
-| `SYNC_TEAMS_CRON` | Cron expression for `SyncTeamsJob` | `0 4 * * *` (04:00 daily) |
-| `SYNC_FIXTURES_CRON` | Cron expression for `SyncFixturesJob` | `0 6 * * 1` (06:00 every Monday) |
-| `LIVE_POLL_INTERVAL_SECONDS` | Polling interval for live score and kickoff jobs | `60` |
-| `CONNECTION_STRING` | PostgreSQL connection string for the Updater's own database | `Host=...;Database=updater;...` |
+| Environment variable         | Description                                                                                                  | Example                               |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| `CATALOG_SERVICE_URL`        | Base URL of the Catalog service REST API                                                                     | `http://catalog-service:8080`         |
+| `FIXTURES_SERVICE_URL`       | Base URL of the Fixtures service REST API                                                                    | `http://fixtures-service:8080`        |
+| `SYNC_COMPETITIONS_CRON`     | Cron expression for `SyncCompetitionsJob`                                                                    | `0 3 * * *` (03:00 daily)             |
+| `SYNC_TEAMS_CRON`            | Cron expression for `SyncTeamsJob`                                                                           | `0 4 * * *` (04:00 daily)             |
+| `SYNC_FIXTURES_CRON`         | Cron expression for `SyncFixturesJob`                                                                        | `0 6 * * 1` (06:00 every Monday)      |
+| `LIVE_POLL_INTERVAL_SECONDS` | Polling interval for live score and kickoff jobs                                                             | `60`                                  |
+| `CONNECTION_STRING`          | PostgreSQL connection string for the shared FootballCatch database (Updater owns tables prefixed `updater_`) | `Host=...;Database=footballcatch;...` |
 
 ---
 
@@ -140,5 +141,5 @@ Declared in `appsettings.json`; secrets supplied per-environment (see "Secrets" 
 - **Idempotency via state hash.** The Updater stores a hash of the last-synced payload per external entity. Only entities whose hash has changed are forwarded to the downstream service, preventing duplicate REST calls and redundant event emissions.
 - **Live polling activation.** The `LiveScorePollingJob` and `KickoffLockJob` should only run at elevated frequency when matches are actually in progress. Outside match windows they can run at a reduced cadence (or sleep entirely) to conserve API quota.
 - **Clock skew between external API and platform.** External API timestamps may lag by 1–2 minutes relative to actual kickoff. Apply a configurable tolerance window before treating a match as `In Progress`.
-- **No direct database access to Catalog or Fixtures.** The Updater must never read from or write to another service's database. All interactions go through REST APIs.
+- **No direct table access to Catalog- or Fixtures-owned tables.** The shared database (ADR-0007) does not enforce isolation; the boundary is maintained by code review. All cross-module interactions go through REST APIs.
 - **Polly retry only covers transient HTTP failures.** The resilience pipeline retries on `HttpRequestException`, HTTP `>= 500`, and `408`. Business 4xx responses (e.g. `401` Unauthorized, `403` Forbidden, `404` Not Found, `429` rate-limited) are **not** retried by the default policy — they are surfaced to the caller, which must decide how to handle them. `429` in particular needs an explicit back-off strategy at the job level; do not rely on the HTTP resilience handler to absorb it.
