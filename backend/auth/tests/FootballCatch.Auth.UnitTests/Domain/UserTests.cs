@@ -24,7 +24,7 @@ public sealed class UserTests
         var providerUserId = "google-123";
 
         // Act
-        var user = User.CreateWithExternalProvider
+        var user = User.CreateUserAndLinkToExternalProvider
         (
             email, 
             fullName, 
@@ -48,7 +48,7 @@ public sealed class UserTests
     public void JoinUserWithExternalProvider_ShouldLinkProvider_WhenNotAlreadyLinked()
     {
         // Arrange
-        var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "google-123",_now);
+        var user = User.CreateUserAndLinkToExternalProvider("test@gmail.com", "Test", "Google", "google-123",_now);
 
         // Act
         user.LinkUserWithExternalProvider("GitHub", "github-456",_now);
@@ -62,7 +62,7 @@ public sealed class UserTests
     public void JoinUserWithExternalProvider_ShouldThrowDomainException_WhenProviderAlreadyLinked()
     {
         // Arrange
-        var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "google-123",_now);
+        var user = User.CreateUserAndLinkToExternalProvider("test@gmail.com", "Test", "Google", "google-123",_now);
 
         // Act
         var act = () => user.LinkUserWithExternalProvider("Google", "google-123",_now);
@@ -80,7 +80,7 @@ public sealed class UserTests
     public void RegisterDevice_ShouldCreateNewDevice_WhenDeviceNotExists()
     {
         // Arrange
-        var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "123",_now);
+        var user = User.CreateUserAndLinkToExternalProvider("test@gmail.com", "Test", "Google", "123",_now);
         var now = DateTime.UtcNow;
 
         // Act
@@ -96,7 +96,7 @@ public sealed class UserTests
     public void RegisterDevice_ShouldReuseDevice_WhenDeviceAlreadyExists()
     {
         // Arrange
-        var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "123",_now);
+        var user = User.CreateUserAndLinkToExternalProvider("test@gmail.com", "Test", "Google", "123",_now);
         var now = DateTime.UtcNow;
         user.RegisterDevice("device-uuid", "Chrome Windows", "Web", now);
 
@@ -111,7 +111,7 @@ public sealed class UserTests
     public void RegisterDevice_ShouldUpdateLastSeenAt_WhenDeviceAlreadyExists()
     {
         // Arrange
-        var user = User.CreateWithExternalProvider("test@gmail.com", "Test", "Google", "123",_now);
+        var user = User.CreateUserAndLinkToExternalProvider("test@gmail.com", "Test", "Google", "123",_now);
         var now = DateTime.UtcNow;
         user.RegisterDevice("device-uuid", "Chrome Windows", "Web", now);
         var laterDate = now.AddDays(1);

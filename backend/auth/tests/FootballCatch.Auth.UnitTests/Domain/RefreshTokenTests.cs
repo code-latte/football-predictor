@@ -15,7 +15,7 @@ public sealed class RefreshTokenTests
     public void SetUp()
     {
         // Necesitamos un User y un DeviceToken para poder emitir RefreshTokens
-        var user = User.CreateWithExternalProvider
+        var user = User.CreateUserAndLinkToExternalProvider
         (
             "test@gmail.com", 
             "Test", 
