@@ -9,12 +9,16 @@
   <ItemGroup>
     <ProjectReference Include="..\FootballCatch.Updater.Application\FootballCatch.Updater.Application.csproj" />
     <ProjectReference Include="..\FootballCatch.Updater.Migrations\FootballCatch.Updater.Migrations.csproj" />
+    <ProjectReference Include="..\..\..\common\FootballCatch.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.8" />
     <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
     <PackageReference Include="FluentMigrator.Runner.Postgres" Version="6.2.0" />
   </ItemGroup>
