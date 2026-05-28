@@ -9,7 +9,7 @@ using FootballCatch.Common.Types;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace FootballCatch.Auth.Tests.Application;
+namespace FootballCatch.Auth.UnitTests.Application;
 
 [TestFixture]
 public sealed class GoogleLoginCommandHandlerTests
