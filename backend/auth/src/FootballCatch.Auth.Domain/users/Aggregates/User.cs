@@ -38,6 +38,10 @@ namespace FootballCatch.Auth.Domain.Users.Aggregates
         /// </summary>
         public IReadOnlyCollection<ExternalLogin> ExternalLogins => _externalLogins.AsReadOnly();
         /// <summary>
+        /// One time password code
+        /// </summary>
+        public OtpCode otpCode {get; private set;}
+        /// <summary>
         ///  Create a user with a external provider (Google, github...)
         /// </summary>
         /// <param name="email"></param>

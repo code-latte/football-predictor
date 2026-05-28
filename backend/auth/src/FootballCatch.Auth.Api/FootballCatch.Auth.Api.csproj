@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FootballCatch.Auth.Infrastructure\FootballCatch.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\FootballCatch.Auth.Application\FootballCatch.Auth.Application.csproj" />
+    <ProjectReference Include="..\FootballCatch.Auth.Domain\FootballCatch.Auth.Domain.csproj" />
   </ItemGroup>
 
 </Project>
